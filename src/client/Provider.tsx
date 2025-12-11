@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react'
-import type { CookieCategory } from '../types'
+import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react'
+import type { CookieCategory, ConsentState, GoogleConsentModeConfig } from '../types'
+import { initGoogleConsentMode, updateGoogleConsent } from './googleConsentMode'
 
 export type CookiePreferences = {
   necessary: boolean
@@ -49,14 +50,48 @@ export function useCookieConsent() {
 type CookieConsentProviderProps = {
   children: React.ReactNode
   storageKey?: string
+  googleConsentMode?: GoogleConsentModeConfig
+  onConsentChange?: (consent: ConsentState) => void
 }
 
 export function CookieConsentProvider({
   children,
   storageKey = 'cookie-consent-preferences',
+  googleConsentMode,
+  onConsentChange,
 }: CookieConsentProviderProps) {
   const [preferences, setPreferences] = useState<CookiePreferences | null>(null)
   const [loading, setLoading] = useState(true)
+  const initializedRef = useRef(false)
+
+  // Initialize Google Consent Mode as early as possible (before GTM loads)
+  useEffect(() => {
+    if (typeof window === 'undefined' || initializedRef.current) return
+    if (!googleConsentMode?.enabled) return
+
+    initializedRef.current = true
+
+    // Try to get stored consent synchronously for immediate initialization
+    let storedConsent: ConsentState | null = null
+    try {
+      const stored = localStorage.getItem(storageKey)
+      if (stored) {
+        const parsed = JSON.parse(stored) as CookiePreferences
+        if (parsed.consentGiven) {
+          storedConsent = {
+            necessary: true,
+            analytics: parsed.analytics,
+            marketing: parsed.marketing,
+            functional: parsed.functional,
+          }
+        }
+      }
+    } catch {
+      // Ignore errors, will default to denied
+    }
+
+    initGoogleConsentMode(googleConsentMode, storedConsent)
+  }, [googleConsentMode, storageKey])
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -83,6 +118,27 @@ export function CookieConsentProvider({
     }
   }, [storageKey])
 
+  // Helper to notify consent changes
+  const notifyConsentChange = useCallback(
+    (prefs: CookiePreferences) => {
+      const consentState: ConsentState = {
+        necessary: true,
+        analytics: prefs.analytics,
+        marketing: prefs.marketing,
+        functional: prefs.functional,
+      }
+
+      // Update Google Consent Mode if enabled
+      if (googleConsentMode?.enabled) {
+        updateGoogleConsent(consentState)
+      }
+
+      // Call custom callback if provided
+      onConsentChange?.(consentState)
+    },
+    [googleConsentMode?.enabled, onConsentChange]
+  )
+
   // Update consent helper
   const updateConsent = useCallback(
     (value: CookiePreferences) => {
@@ -97,8 +153,9 @@ export function CookieConsentProvider({
           )
         }
       }
+      notifyConsentChange(value)
     },
-    [storageKey]
+    [storageKey, notifyConsentChange]
   )
 
   const hasConsent = useCallback(() => {
@@ -169,10 +226,13 @@ export function CookieConsentProvider({
           }
         }
 
+        // Notify consent change
+        notifyConsentChange(next)
+
         return next
       })
     },
-    [storageKey]
+    [storageKey, notifyConsentChange]
   )
 
   const resetConsent = useCallback(() => {

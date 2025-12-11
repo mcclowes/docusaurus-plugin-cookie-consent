@@ -16,6 +16,7 @@ A cookie consent modal/toast component for Docusaurus sites with configurable te
 - ✅ **Local storage tracking** of user preferences
 - ✅ **Modal or toast mode** (centered modal or bottom toast)
 - ✅ **Cookie categories** (Necessary, Analytics, Marketing, Functional)
+- ✅ **Google Consent Mode v2** integration for GTM/GA4
 - ✅ **TypeScript support** with full type definitions
 
 ## Compatibility
@@ -123,6 +124,44 @@ That's it! The cookie consent banner will automatically appear on your site.
   }
 }
 ```
+
+### Google Consent Mode v2 Integration
+
+Integrate with Google Tag Manager, Google Analytics 4, and Google Ads using [Google Consent Mode v2](https://developers.google.com/tag-platform/security/guides/consent):
+
+```typescript
+{
+  // ... other options ...
+
+  googleConsentMode: {
+    // Enable Google Consent Mode integration
+    enabled: true,
+
+    // Time to wait for consent before loading tags (default: 500ms)
+    waitForUpdate: 500,
+
+    // Redact ad click identifiers when ad_storage is denied (default: true)
+    adsDataRedaction: true,
+
+    // Pass ad click info through URL parameters when cookies denied (default: false)
+    urlPassthrough: false,
+  },
+
+  // Optional: callback when consent changes (for custom integrations)
+  onConsentChange: (consent) => {
+    console.log('Consent updated:', consent)
+    // { necessary: true, analytics: true, marketing: false, functional: true }
+  },
+}
+```
+
+**How it works:**
+
+1. **Before GTM loads**: Default consent is set to `denied` for all categories
+2. **On page load**: If stored consent exists, it's applied immediately
+3. **When user consents**: Google Consent Mode is updated with `gtag('consent', 'update', ...)`
+
+This ensures tracking tags configured for Consent Mode wait for user approval before firing.
 
 ### Complete Example
 
@@ -349,6 +388,8 @@ import type {
   CookieCategory,
   CookieConsentLink,
   CookiePreferences,
+  ConsentState,
+  GoogleConsentModeConfig,
 } from 'docusaurus-plugin-cookie-consent'
 ```
 
@@ -390,6 +431,57 @@ Then add the plugin to your `docusaurus.config.js` as shown above.
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Requires JavaScript enabled
 - Uses `localStorage` (available in all modern browsers)
+
+## Using with Google Tag Manager
+
+When using this plugin with `@docusaurus/plugin-google-gtag` or `@docusaurus/plugin-google-tag-manager`, enable Google Consent Mode to ensure tracking respects user consent:
+
+```ts
+// docusaurus.config.ts
+const config: Config = {
+  plugins: [
+    // This plugin MUST be listed BEFORE google-gtag/google-tag-manager
+    [
+      'docusaurus-plugin-cookie-consent',
+      {
+        googleConsentMode: {
+          enabled: true,
+        },
+        // ... other options
+      },
+    ],
+    // Google plugins load after consent defaults are set
+    [
+      '@docusaurus/plugin-google-gtag',
+      {
+        trackingID: 'G-XXXXXXXXXX',
+      },
+    ],
+  ],
+}
+```
+
+### GTM Tag Configuration
+
+For tags in Google Tag Manager to respect consent:
+
+1. Go to your GTM container
+2. Navigate to **Admin > Container Settings**
+3. Enable **"Enable consent overview"**
+4. For each tag, set the appropriate consent requirement:
+   - Analytics tags: Require `analytics_storage`
+   - Ads/Marketing tags: Require `ad_storage`
+
+Tags configured this way will only fire after the user grants consent.
+
+### Consent Mode Mapping
+
+| Plugin Category | Google Consent Signal    |
+| --------------- | ------------------------ |
+| `analytics`     | `analytics_storage`      |
+| `marketing`     | `ad_storage`, `ad_user_data`, `ad_personalization` |
+| `functional`    | `functionality_storage`, `personalization_storage` |
+| `necessary`     | `security_storage` (always granted) |
 
 ## GDPR Compliance
 

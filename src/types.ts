@@ -5,6 +5,38 @@ export type CookieConsentLink = {
   href: string
 }
 
+export type ConsentState = {
+  necessary: boolean
+  analytics: boolean
+  marketing: boolean
+  functional: boolean
+}
+
+export type GoogleConsentModeConfig = {
+  /**
+   * Enable Google Consent Mode v2 integration.
+   * When enabled, the plugin will automatically update gtag consent state.
+   * @default false
+   */
+  enabled?: boolean
+  /**
+   * Wait for consent update before loading tags (in milliseconds).
+   * Google recommends 500ms for EU users.
+   * @default 500
+   */
+  waitForUpdate?: number
+  /**
+   * Enable ads_data_redaction when ad_storage is denied.
+   * @default true
+   */
+  adsDataRedaction?: boolean
+  /**
+   * Enable URL passthrough for ad click information when cookies are denied.
+   * @default false
+   */
+  urlPassthrough?: boolean
+}
+
 export type CookieConsentOptions = {
   /**
    * Enable or disable the cookie consent banner
@@ -52,4 +84,15 @@ export type CookieConsentOptions = {
       enabled?: boolean
     }
   }
+  /**
+   * Google Consent Mode v2 configuration.
+   * When enabled, the plugin integrates with Google's consent framework
+   * to control GTM, GA4, and Google Ads based on user consent.
+   */
+  googleConsentMode?: GoogleConsentModeConfig
+  /**
+   * Callback fired when consent preferences change.
+   * Use this for custom integrations with other analytics/tracking tools.
+   */
+  onConsentChange?: (consent: ConsentState) => void
 }

@@ -6,7 +6,19 @@ import { createRoot } from 'react-dom/client'
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment'
 import { CookieConsentProvider } from './Provider'
 import { CookieConsentModal } from './Modal'
+import { setDefaultConsent } from './googleConsentMode'
 import './Modal.css'
+
+// Initialize Google Consent Mode defaults IMMEDIATELY (before GTM loads)
+// This runs synchronously at module load time - critical for blocking tracking
+if (ExecutionEnvironment.canUseDOM) {
+  const globalData = (window as any)?.docusaurus?.globalData
+  const options = globalData?.['docusaurus-plugin-cookie-consent']?.default?.options
+
+  if (options?.googleConsentMode?.enabled) {
+    setDefaultConsent(options.googleConsentMode)
+  }
+}
 
 if (ExecutionEnvironment.canUseDOM) {
   // Wait for DOM to be ready
@@ -34,7 +46,11 @@ function initCookieConsent() {
   // Render the cookie consent system
   const root = createRoot(container)
   root.render(
-    <CookieConsentProvider storageKey={storageKey}>
+    <CookieConsentProvider
+      storageKey={storageKey}
+      googleConsentMode={options?.googleConsentMode}
+      onConsentChange={options?.onConsentChange}
+    >
       <CookieConsentModal options={options} />
     </CookieConsentProvider>
   )

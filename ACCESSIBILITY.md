@@ -14,7 +14,7 @@ The modal dialog includes proper ARIA attributes for screen readers:
 - **`aria-describedby="cookie-consent-description"`**: Links to the dialog description
 - **`aria-hidden="true"`**: Applied to the backdrop to hide it from screen readers
 
-**Location**: `src/client/Modal.tsx:159-166`
+**Location**: `src/client/Modal.tsx:159-167`
 
 ### 2. Focus Management
 
@@ -23,7 +23,7 @@ Proper focus handling ensures keyboard users can navigate effectively:
 - **Auto-focus on open**: When the modal opens, focus is automatically moved to the first button
 - **Body scroll prevention**: The page body scrolling is disabled while the modal is open
 
-**Location**: `src/client/Modal.tsx:42-70`
+**Location**: `src/client/Modal.tsx:42-72`
 
 ### 3. Keyboard Navigation
 
@@ -33,7 +33,7 @@ Keyboard support for interactions:
 - **Tab/Shift+Tab**: Navigate between interactive elements (native browser behavior)
 - **Enter/Space**: Activate buttons (native browser behavior)
 
-**Location**: `src/client/Modal.tsx:47-51`
+**Location**: `src/client/Modal.tsx:47-53`
 
 ### 4. Screen Reader Announcements
 
@@ -45,8 +45,8 @@ Links that open in new tabs include appropriate warnings for screen reader users
 
 **Location**:
 
-- Markdown links: `src/client/Modal.tsx:93-104`
-- Link array: `src/client/Modal.tsx:182-192`
+- Markdown links: `src/client/Modal.tsx:78-104` (renderDescription function)
+- Link array: `src/client/Modal.tsx:179-193`
 
 ### 5. Semantic HTML
 
@@ -55,7 +55,7 @@ Proper heading hierarchy and semantic elements:
 - **`<h2>` heading**: Dialog title uses proper heading level with `id` for ARIA reference
 - **Descriptive IDs**: All referenced elements have clear, semantic IDs
 
-**Location**: `src/client/Modal.tsx:168-177`
+**Location**: `src/client/Modal.tsx:168-178`
 
 ### 6. Backdrop Interaction Prevention
 
@@ -64,7 +64,7 @@ The modal backdrop properly blocks interaction with page content:
 - **Click prevention**: Clicks on the backdrop are prevented from reaching underlying content
 - **`aria-hidden`**: Backdrop is hidden from assistive technologies
 
-**Location**: `src/client/Modal.tsx:147-156`
+**Location**: `src/client/Modal.tsx:145-157`
 
 ## Testing Accessibility
 

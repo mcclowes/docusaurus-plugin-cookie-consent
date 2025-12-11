@@ -66,14 +66,14 @@ Add runtime validation when loading from localStorage to handle corrupted data m
 
 ### Feature Suggestions (Medium Priority)
 
-#### 1. Event Callbacks for Analytics Integration
+#### 1. Event Callbacks for Analytics Integration - DONE
 
-Add optional callbacks to `CookieConsentOptions`:
+Added `onConsentChange` callback to `CookieConsentOptions`:
 ```ts
-onConsentChange?: (preferences: CookiePreferences) => void
-onAcceptAll?: () => void
-onRejectAll?: () => void
+onConsentChange?: (consent: ConsentState) => void
 ```
+
+Also added full Google Consent Mode v2 integration via `googleConsentMode` option.
 
 #### 2. Consent Expiry/Refresh
 
@@ -158,7 +158,7 @@ Document breaking changes between major versions.
 | **DONE** | Fix hasCategoryConsent for necessary | High |
 | **DONE** | Add React component tests | High |
 | **DONE** | Add ESLint | Medium |
-| Pending | Add event callbacks | Medium |
+| **DONE** | Add event callbacks (onConsentChange, Google Consent Mode) | Medium |
 | Pending | Implement focus trap | Medium |
 | Pending | Add consent expiry | Medium |
 | Pending | Refactor duplicated code | Low |
