@@ -107,9 +107,9 @@ export function CookieConsentProvider({
 
   const hasCategoryConsent = useCallback(
     (category: CookieCategory) => {
-      if (!preferences) return false
-      // Necessary cookies are always allowed
+      // Necessary cookies are always allowed, even before consent is given
       if (category === 'necessary') return true
+      if (!preferences) return false
       return preferences[category] ?? false
     },
     [preferences]

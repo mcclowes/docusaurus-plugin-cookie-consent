@@ -39,7 +39,7 @@ describe('cookieConsentPlugin', () => {
     const plugin = cookieConsentPlugin(createContext(), {
       enabled: true,
       title: 'Custom Title',
-      links: [{ text: 'Privacy Policy', url: '/privacy' }],
+      links: [{ label: 'Privacy Policy', href: '/privacy' }],
     })
 
     const content = await plugin.loadContent?.()
