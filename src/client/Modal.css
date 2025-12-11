@@ -42,7 +42,7 @@
   z-index: 10000;
 }
 
-.cookie-consent-toastOverlay {
+.cookie-consent-toast-overlay {
   background-color: transparent;
   pointer-events: none;
 }
@@ -91,14 +91,14 @@
 }
 
 /* Details section */
-.details {
+.cookie-consent-details {
   margin-bottom: 20px;
   padding: 16px;
   background-color: var(--ifm-background-color, #f5f5f5);
   border-radius: 4px;
 }
 
-.detailsTitle {
+.cookie-consent-details-title {
   margin: 0 0 12px 0;
   font-size: 16px;
   font-weight: 600;
@@ -108,18 +108,18 @@
   margin-bottom: 12px;
 }
 
-.cookie-consent-categoryLabel {
+.cookie-consent-category-label {
   font-weight: 500;
   margin-bottom: 4px;
 }
 
-.cookie-consent-categoryRequired {
+.cookie-consent-category-required {
   margin-left: 8px;
   font-size: 12px;
   color: var(--ifm-color-emphasis-600, #666);
 }
 
-.cookie-consent-categoryDescription {
+.cookie-consent-category-description {
   font-size: 13px;
   color: var(--ifm-color-emphasis-600, #666);
 }
@@ -131,7 +131,7 @@
   gap: 12px;
 }
 
-.cookie-consent-buttonsToast {
+.cookie-consent-buttons-toast {
   flex-direction: row;
   flex-wrap: wrap;
 }
@@ -205,13 +205,13 @@
 }
 
 /* Toast mode button sizing */
-.cookie-consent-buttonsToast .button {
+.cookie-consent-buttons-toast .cookie-consent-button {
   flex: 1;
   min-width: 120px;
 }
 
 /* Screen reader only content */
-.srOnly {
+.cookie-consent-sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -225,31 +225,31 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .modal {
+  .cookie-consent-modal {
     width: 95%;
     padding: 20px;
   }
 
-  .toast {
+  .cookie-consent-toast {
     bottom: 10px;
     left: 10px;
     right: 10px;
     width: calc(100% - 20px);
   }
 
-  .title {
+  .cookie-consent-title {
     font-size: 20px;
   }
 
-  .buttons {
+  .cookie-consent-buttons {
     flex-direction: column;
   }
 
-  .buttonsToast {
+  .cookie-consent-buttons-toast {
     flex-direction: column;
   }
 
-  .buttonsToast .button {
+  .cookie-consent-buttons-toast .cookie-consent-button {
     min-width: auto;
   }
 }
