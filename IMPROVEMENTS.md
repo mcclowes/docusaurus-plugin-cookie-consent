@@ -58,9 +58,9 @@ The `updateConsent` and `updatePreferences` functions both contain similar local
 
 Move `defaultCategories` from `Modal.tsx` to a separate constants file.
 
-#### 3. Validate Stored Preferences Schema
+#### 3. Validate Stored Preferences Schema - DONE
 
-Add runtime validation when loading from localStorage to handle corrupted data more gracefully.
+Added `validatePreferences()` function that validates stored data shape and removes corrupted preferences.
 
 ---
 
@@ -86,16 +86,13 @@ consentExpiryDays?: number  // e.g., 365 days
 
 Add checkboxes for each non-necessary category when "Show Details" is expanded.
 
-#### 4. Custom Event Dispatch
+#### 4. Custom Event Dispatch - DONE
 
-Dispatch custom DOM events for external integration:
-```tsx
-window.dispatchEvent(new CustomEvent('cookieConsentChange', { detail: preferences }))
-```
+Now dispatches `cookieConsentChange` event on consent changes.
 
-#### 5. Complete Focus Trap Implementation
+#### 5. Complete Focus Trap Implementation - DONE
 
-Add full Tab/Shift+Tab focus cycling within the modal for better accessibility.
+Added full Tab/Shift+Tab focus cycling within the modal.
 
 ---
 
@@ -159,7 +156,9 @@ Document breaking changes between major versions.
 | **DONE** | Add React component tests | High |
 | **DONE** | Add ESLint | Medium |
 | **DONE** | Add event callbacks (onConsentChange, Google Consent Mode) | Medium |
-| Pending | Implement focus trap | Medium |
+| **DONE** | Implement focus trap | Medium |
+| **DONE** | Validate stored preferences | Medium |
+| **DONE** | Custom DOM event dispatch | Medium |
 | Pending | Add consent expiry | Medium |
 | Pending | Refactor duplicated code | Low |
 | Pending | Add coverage reporting | Low |

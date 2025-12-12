@@ -25,6 +25,35 @@ type CookieContextType = {
 
 const CookieConsentContext = createContext<CookieContextType | null>(null)
 
+/**
+ * Validates that stored preferences have the expected shape.
+ * Returns null if validation fails, allowing the modal to show again.
+ */
+function validatePreferences(data: unknown): CookiePreferences | null {
+  if (!data || typeof data !== 'object') return null
+
+  const prefs = data as Record<string, unknown>
+
+  // Check required boolean fields
+  if (typeof prefs.necessary !== 'boolean') return null
+  if (typeof prefs.analytics !== 'boolean') return null
+  if (typeof prefs.marketing !== 'boolean') return null
+  if (typeof prefs.functional !== 'boolean') return null
+  if (typeof prefs.consentGiven !== 'boolean') return null
+
+  // timestamp is optional but must be a number if present
+  if (prefs.timestamp !== undefined && typeof prefs.timestamp !== 'number') return null
+
+  return {
+    necessary: prefs.necessary,
+    analytics: prefs.analytics,
+    marketing: prefs.marketing,
+    functional: prefs.functional,
+    consentGiven: prefs.consentGiven,
+    timestamp: prefs.timestamp as number | undefined,
+  }
+}
+
 export function useCookieConsent() {
   const context = useContext(CookieConsentContext)
   if (!context) {
@@ -76,8 +105,8 @@ export function CookieConsentProvider({
     try {
       const stored = localStorage.getItem(storageKey)
       if (stored) {
-        const parsed = JSON.parse(stored) as CookiePreferences
-        if (parsed.consentGiven) {
+        const parsed = validatePreferences(JSON.parse(stored))
+        if (parsed?.consentGiven) {
           storedConsent = {
             necessary: true,
             analytics: parsed.analytics,
@@ -105,8 +134,16 @@ export function CookieConsentProvider({
       const stored = localStorage.getItem(storageKey)
 
       if (stored) {
-        const parsed = JSON.parse(stored) as CookiePreferences
-        setPreferences(parsed)
+        const parsed = validatePreferences(JSON.parse(stored))
+        if (parsed) {
+          setPreferences(parsed)
+        } else {
+          // Invalid data - remove corrupted preferences
+          console.warn(
+            '[docusaurus-plugin-cookie-consent] Invalid preferences in localStorage, resetting'
+          )
+          localStorage.removeItem(storageKey)
+        }
       }
     } catch (error) {
       console.warn(

@@ -38,16 +38,49 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
   // Determine if modal should be shown
   const shouldShow = !loading && !preferences?.consentGiven
 
-  // Keyboard and focus management
+  // Keyboard and focus management with focus trap
   useEffect(() => {
     // Don't set up event listeners if modal shouldn't be shown
     if (!shouldShow) return
     if (typeof window === 'undefined') return
 
+    const getFocusableElements = (): HTMLElement[] => {
+      if (!modalRef.current) return []
+      return Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute('disabled') && el.offsetParent !== null)
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         // ESC key - treat as reject all
         rejectAll()
+        return
+      }
+
+      // Focus trap: Tab and Shift+Tab cycling
+      if (e.key === 'Tab') {
+        const focusableElements = getFocusableElements()
+        if (focusableElements.length === 0) return
+
+        const firstElement = focusableElements[0]
+        const lastElement = focusableElements[focusableElements.length - 1]
+
+        if (e.shiftKey) {
+          // Shift+Tab: if on first element, go to last
+          if (document.activeElement === firstElement) {
+            e.preventDefault()
+            lastElement.focus()
+          }
+        } else {
+          // Tab: if on last element, go to first
+          if (document.activeElement === lastElement) {
+            e.preventDefault()
+            firstElement.focus()
+          }
+        }
       }
     }
 
@@ -59,8 +92,8 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
 
     // Focus the first button
     setTimeout(() => {
-      const firstButton = modalRef.current?.querySelector('button')
-      firstButton?.focus()
+      const focusableElements = getFocusableElements()
+      focusableElements[0]?.focus()
     }, 100)
 
     return () => {

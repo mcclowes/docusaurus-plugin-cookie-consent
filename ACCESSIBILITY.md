@@ -116,7 +116,7 @@ Accessibility features are supported in:
 
 Potential improvements for even better accessibility:
 
-1. **Focus trapping**: Full Tab/Shift+Tab cycling within the modal
+1. ~~**Focus trapping**: Full Tab/Shift+Tab cycling within the modal~~ ✅ Implemented
 2. **Focus restoration**: Return focus to previous element after closing
 3. **Live region announcements**: Announce consent status changes
 4. **Reduced motion support**: Respect `prefers-reduced-motion` media query

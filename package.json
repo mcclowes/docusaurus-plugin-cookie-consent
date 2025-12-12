@@ -1,6 +1,6 @@
 {
   "name": "docusaurus-plugin-cookie-consent",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "A cookie consent modal/toast component for Docusaurus sites with configurable text, links, and preference management.",
   "license": "MIT",
   "type": "module",

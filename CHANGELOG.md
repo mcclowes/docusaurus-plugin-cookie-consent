@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2024-12-12
+
 ### Added
 - Google Consent Mode v2 integration for GTM/GA4/Google Ads
 - `googleConsentMode` configuration option with `enabled`, `waitForUpdate`, `adsDataRedaction`, `urlPassthrough`
@@ -15,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New exported types: `ConsentState`, `GoogleConsentModeConfig`
 - New exported utilities: `setDefaultConsent`, `updateGoogleConsent`, `initGoogleConsentMode`
 - Documentation for custom analytics integration (PostHog, Plausible examples)
+- Focus trap for keyboard navigation (Tab/Shift+Tab cycles within modal)
+- Validation of stored preferences to handle corrupted localStorage data
 
 ## [4.0.2] - 2024-12-11
 
