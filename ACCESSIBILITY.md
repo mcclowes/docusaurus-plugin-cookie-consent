@@ -14,7 +14,7 @@ The modal dialog includes proper ARIA attributes for screen readers:
 - **`aria-describedby="cookie-consent-description"`**: Links to the dialog description
 - **`aria-hidden="true"`**: Applied to the backdrop to hide it from screen readers
 
-**Location**: `src/client/Modal.tsx:159-167`
+**Location**: `src/client/Modal.tsx:192-200`
 
 ### 2. Focus Management
 
@@ -23,17 +23,17 @@ Proper focus handling ensures keyboard users can navigate effectively:
 - **Auto-focus on open**: When the modal opens, focus is automatically moved to the first button
 - **Body scroll prevention**: The page body scrolling is disabled while the modal is open
 
-**Location**: `src/client/Modal.tsx:42-72`
+**Location**: `src/client/Modal.tsx:42-103`
 
 ### 3. Keyboard Navigation
 
 Keyboard support for interactions:
 
 - **ESC key**: Pressing Escape triggers the "Reject All" action and closes the modal
-- **Tab/Shift+Tab**: Navigate between interactive elements (native browser behavior)
+- **Tab/Shift+Tab**: Full focus trap - cycles within modal (doesn't escape to page content)
 - **Enter/Space**: Activate buttons (native browser behavior)
 
-**Location**: `src/client/Modal.tsx:47-53`
+**Location**: `src/client/Modal.tsx:56-84`
 
 ### 4. Screen Reader Announcements
 
@@ -45,8 +45,8 @@ Links that open in new tabs include appropriate warnings for screen reader users
 
 **Location**:
 
-- Markdown links: `src/client/Modal.tsx:78-104` (renderDescription function)
-- Link array: `src/client/Modal.tsx:179-193`
+- Markdown links: `src/client/Modal.tsx:111-143` (renderDescription function)
+- Link array: `src/client/Modal.tsx:212-226`
 
 ### 5. Semantic HTML
 
@@ -55,7 +55,7 @@ Proper heading hierarchy and semantic elements:
 - **`<h2>` heading**: Dialog title uses proper heading level with `id` for ARIA reference
 - **Descriptive IDs**: All referenced elements have clear, semantic IDs
 
-**Location**: `src/client/Modal.tsx:168-178`
+**Location**: `src/client/Modal.tsx:201-211`
 
 ### 6. Backdrop Interaction Prevention
 
@@ -64,7 +64,7 @@ The modal backdrop properly blocks interaction with page content:
 - **Click prevention**: Clicks on the backdrop are prevented from reaching underlying content
 - **`aria-hidden`**: Backdrop is hidden from assistive technologies
 
-**Location**: `src/client/Modal.tsx:145-157`
+**Location**: `src/client/Modal.tsx:178-190`
 
 ## Testing Accessibility
 
