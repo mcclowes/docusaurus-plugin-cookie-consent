@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Google Consent Mode v2 integration for GTM/GA4/Google Ads
 - `googleConsentMode` configuration option with `enabled`, `waitForUpdate`, `adsDataRedaction`, `urlPassthrough`
 - `onConsentChange` callback for custom integrations
+- `cookieConsentChange` DOM event dispatched on consent changes (for PostHog, Plausible, etc.)
 - New exported types: `ConsentState`, `GoogleConsentModeConfig`
 - New exported utilities: `setDefaultConsent`, `updateGoogleConsent`, `initGoogleConsentMode`
+- Documentation for custom analytics integration (PostHog, Plausible examples)
 
 ## [4.0.2] - 2024-12-11
 

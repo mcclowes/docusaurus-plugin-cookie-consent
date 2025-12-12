@@ -133,6 +133,15 @@ export function CookieConsentProvider({
         updateGoogleConsent(consentState)
       }
 
+      // Dispatch custom DOM event for third-party integrations
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('cookieConsentChange', {
+            detail: consentState,
+          })
+        )
+      }
+
       // Call custom callback if provided
       onConsentChange?.(consentState)
     },

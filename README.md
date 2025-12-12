@@ -483,6 +483,131 @@ Tags configured this way will only fire after the user grants consent.
 | `functional`    | `functionality_storage`, `personalization_storage` |
 | `necessary`     | `security_storage` (always granted) |
 
+## Custom Analytics Integration (PostHog, Plausible, etc.)
+
+For analytics tools that don't support Google Consent Mode, the plugin dispatches a custom DOM event whenever consent changes. You can listen to this event to conditionally initialize or shutdown your analytics.
+
+### The `cookieConsentChange` Event
+
+The plugin automatically dispatches a `cookieConsentChange` event on the `window` object whenever consent preferences change:
+
+```typescript
+window.addEventListener('cookieConsentChange', (event: CustomEvent) => {
+  const consent = event.detail
+  // consent = { necessary: true, analytics: boolean, marketing: boolean, functional: boolean }
+
+  if (consent.analytics) {
+    // Initialize your analytics
+    initAnalytics()
+  } else {
+    // Shutdown/disable analytics
+    shutdownAnalytics()
+  }
+})
+```
+
+### Example: PostHog Integration
+
+Create a client module that listens for consent changes:
+
+```javascript
+// src/clientModules/posthog.js
+import posthog from 'posthog-js'
+
+const STORAGE_KEY = 'cookie-consent-preferences' // Match your plugin's storageKey
+
+let initialized = false
+
+function initPosthog() {
+  if (initialized) return
+  posthog.init('YOUR_PROJECT_KEY', { api_host: 'https://app.posthog.com' })
+  initialized = true
+}
+
+function shutdownPosthog() {
+  if (!initialized) return
+  posthog.opt_out_capturing()
+  initialized = false
+}
+
+// Listen for consent changes
+window.addEventListener('cookieConsentChange', (event) => {
+  if (event.detail.analytics) {
+    initPosthog()
+  } else {
+    shutdownPosthog()
+  }
+})
+
+// Check initial consent on page load
+const stored = localStorage.getItem(STORAGE_KEY)
+if (stored) {
+  const prefs = JSON.parse(stored)
+  if (prefs.analytics) {
+    initPosthog()
+  }
+}
+```
+
+Register the client module in a custom plugin:
+
+```javascript
+// src/plugins/posthog-plugin.js
+module.exports = function posthogPlugin() {
+  return {
+    name: 'posthog-plugin',
+    getClientModules() {
+      return [require.resolve('../clientModules/posthog')]
+    },
+  }
+}
+```
+
+### Example: Plausible Analytics
+
+Plausible is privacy-friendly and doesn't use cookies, so you may not need consent. But if you want to respect user preferences anyway:
+
+```javascript
+window.addEventListener('cookieConsentChange', (event) => {
+  if (event.detail.analytics) {
+    // Enable Plausible tracking
+    delete window.plausible?.q // Clear any queued events
+    window.plausible = window.plausible || function() {
+      (window.plausible.q = window.plausible.q || []).push(arguments)
+    }
+  } else {
+    // Disable tracking
+    window.plausible = () => {} // No-op function
+  }
+})
+```
+
+### Using the `onConsentChange` Callback
+
+Alternatively, use the `onConsentChange` config option for simpler integrations:
+
+```typescript
+// docusaurus.config.ts
+{
+  plugins: [
+    [
+      'docusaurus-plugin-cookie-consent',
+      {
+        onConsentChange: (consent) => {
+          if (consent.analytics) {
+            // Enable analytics
+          } else {
+            // Disable analytics
+          }
+        },
+      },
+    ],
+  ],
+}
+```
+
+**Note:** The `onConsentChange` callback runs in the React context, while the DOM event works anywhere including vanilla JS client modules.
+
 ## GDPR Compliance
 
 This plugin helps you comply with GDPR requirements by:
