@@ -6,8 +6,5 @@ export * from './hooks'
 export { CookieConsentProvider, useCookieConsent } from './Provider'
 export type { CookiePreferences } from './Provider'
 export { CookieConsentModal } from './Modal'
-export {
-  setDefaultConsent,
-  updateGoogleConsent,
-  initGoogleConsentMode,
-} from './googleConsentMode'
+export { setDefaultConsent, updateGoogleConsent, initGoogleConsentMode } from './googleConsentMode'
+export { detectRegion, isGDPRCountry, clearRegionCache } from './regionDetection'

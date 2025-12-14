@@ -5,12 +5,14 @@ Thanks for your interest in contributing to `docusaurus-plugin-cookie-consent`!
 ## Development Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/mcclowes/docusaurus-plugin-cookie-consent.git
    cd docusaurus-plugin-cookie-consent
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -22,17 +24,17 @@ Thanks for your interest in contributing to `docusaurus-plugin-cookie-consent`!
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Build the plugin for production |
-| `npm run dev` | Watch mode for development |
-| `npm run typecheck` | Run TypeScript type checking |
-| `npm run lint` | Run ESLint |
-| `npm run lint:fix` | Run ESLint with auto-fix |
-| `npm run format` | Format code with Prettier |
-| `npm run format:check` | Check code formatting |
-| `npm test` | Run tests |
-| `npm run test:watch` | Run tests in watch mode |
+| Command                | Description                     |
+| ---------------------- | ------------------------------- |
+| `npm run build`        | Build the plugin for production |
+| `npm run dev`          | Watch mode for development      |
+| `npm run typecheck`    | Run TypeScript type checking    |
+| `npm run lint`         | Run ESLint                      |
+| `npm run lint:fix`     | Run ESLint with auto-fix        |
+| `npm run format`       | Format code with Prettier       |
+| `npm run format:check` | Check code formatting           |
+| `npm test`             | Run tests                       |
+| `npm run test:watch`   | Run tests in watch mode         |
 
 ## Testing Locally
 
@@ -60,6 +62,7 @@ npm start
 ## Making Changes
 
 1. Create a new branch for your feature/fix:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -67,6 +70,7 @@ npm start
 2. Make your changes
 
 3. Run tests and linting:
+
    ```bash
    npm test
    npm run lint

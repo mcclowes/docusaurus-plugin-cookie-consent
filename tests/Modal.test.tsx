@@ -351,7 +351,9 @@ describe('CookieConsentModal', () => {
     })
 
     // Overlay should not be present (only toast-overlay class would be used if any)
-    const overlay = document.querySelector('.cookie-consent-overlay:not(.cookie-consent-toast-overlay)')
+    const overlay = document.querySelector(
+      '.cookie-consent-overlay:not(.cookie-consent-toast-overlay)'
+    )
     expect(overlay).not.toBeInTheDocument()
   })
 

@@ -22,6 +22,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
       storageKey={storageKey}
       googleConsentMode={options?.googleConsentMode}
       onConsentChange={options?.onConsentChange}
+      regionDetection={options?.regionDetection}
     >
       {children}
       {options && <BrowserOnly>{() => <CookieConsentModal options={options} />}</BrowserOnly>}
