@@ -31,12 +31,14 @@ type CookieConsentModalProps = {
 }
 
 export function CookieConsentModal({ options }: CookieConsentModalProps) {
-  const { preferences, loading, acceptAll, rejectOptional, rejectAll } = useCookieConsent()
+  const { preferences, loading, acceptAll, rejectOptional, rejectAll, regionRequiresConsent } =
+    useCookieConsent()
   const [showDetails, setShowDetails] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
 
   // Determine if modal should be shown
-  const shouldShow = !loading && !preferences?.consentGiven
+  // Don't show if: loading, already gave consent, or region doesn't require consent
+  const shouldShow = !loading && !preferences?.consentGiven && regionRequiresConsent
 
   // Keyboard and focus management with focus trap
   useEffect(() => {

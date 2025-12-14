@@ -17,6 +17,7 @@ A cookie consent modal/toast component for Docusaurus sites with configurable te
 - ✅ **Modal or toast mode** (centered modal or bottom toast)
 - ✅ **Cookie categories** (Necessary, Analytics, Marketing, Functional)
 - ✅ **Google Consent Mode v2** integration for GTM/GA4
+- ✅ **Region detection** to conditionally show consent for GDPR regions only
 - ✅ **TypeScript support** with full type definitions
 
 ## Compatibility
@@ -163,6 +164,80 @@ Integrate with Google Tag Manager, Google Analytics 4, and Google Ads using [Goo
 
 This ensures tracking tags configured for Consent Mode wait for user approval before firing.
 
+### Region Detection
+
+Optionally show the consent banner only for users in GDPR regions. Users in non-GDPR regions (e.g., US) won't see the banner:
+
+```typescript
+{
+  // ... other options ...
+
+  regionDetection: {
+    // Enable region-based consent display
+    enabled: true,
+
+    // Detection mode: 'api' (IP geolocation) or 'timezone' (browser timezone)
+    mode: 'api',  // default: 'api'
+
+    // Custom API endpoint (must return JSON with 'country_code' field)
+    apiUrl: 'https://ipapi.co/json/',  // default
+
+    // Require consent in GDPR countries (EU/EEA + UK)
+    requireConsentInGDPRRegions: true,  // default: true
+
+    // Or specify custom regions (ISO 3166-1 alpha-2 codes)
+    // requireRegions: ['DE', 'FR', 'GB'],
+
+    // What to do if detection fails: 'show' or 'hide' the banner
+    fallbackBehavior: 'show',  // default: 'show' (safer for compliance)
+
+    // Cache detected region to avoid repeated API calls (milliseconds)
+    cacheDuration: 86400000,  // default: 24 hours (set to 0 to disable)
+
+    // Callback after region detection completes
+    onRegionDetected: (result) => {
+      console.log('Detected region:', result.countryCode)
+      console.log('Requires consent:', result.requiresConsent)
+    },
+  },
+}
+```
+
+**Detection modes:**
+
+- **`api`** (default): Uses IP geolocation API for accurate detection. Falls back to timezone if API fails.
+- **`timezone`**: Infers region from browser timezone. Less accurate but no network request.
+
+**Built-in GDPR countries:**
+
+The plugin includes all EU member states, EEA countries (Iceland, Liechtenstein, Norway), and the UK. Use the exported `GDPR_COUNTRIES` constant:
+
+```typescript
+import { GDPR_COUNTRIES } from 'docusaurus-plugin-cookie-consent'
+// ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', ...]
+```
+
+**Using region detection programmatically:**
+
+```typescript
+import { detectRegion, isGDPRCountry, clearRegionCache } from 'docusaurus-plugin-cookie-consent'
+
+// Check if a country is in GDPR region
+isGDPRCountry('DE') // true
+isGDPRCountry('US') // false
+
+// Manually detect region
+const result = await detectRegion({
+  enabled: true,
+  mode: 'api',
+})
+console.log(result)
+// { countryCode: 'US', requiresConsent: false, success: true, method: 'api' }
+
+// Clear cached region
+clearRegionCache()
+```
+
 ### Complete Example
 
 ```ts
@@ -254,6 +329,15 @@ const {
 
   // Get current preferences
   preferences: CookiePreferences | null
+
+  // Whether currently loading preferences
+  loading: boolean
+
+  // Region detection result (if regionDetection is enabled)
+  regionDetectionResult: RegionDetectionResult | null
+
+  // Whether the detected region requires consent
+  regionRequiresConsent: boolean
 
   // Programmatically accept all cookies
   acceptAll: () => void
@@ -390,7 +474,13 @@ import type {
   CookiePreferences,
   ConsentState,
   GoogleConsentModeConfig,
+  RegionDetectionConfig,
+  RegionDetectionResult,
+  GDPRCountry,
 } from 'docusaurus-plugin-cookie-consent'
+
+// Also available: GDPR_COUNTRIES constant
+import { GDPR_COUNTRIES } from 'docusaurus-plugin-cookie-consent'
 ```
 
 ## Development
@@ -476,12 +566,12 @@ Tags configured this way will only fire after the user grants consent.
 
 ### Consent Mode Mapping
 
-| Plugin Category | Google Consent Signal    |
-| --------------- | ------------------------ |
-| `analytics`     | `analytics_storage`      |
+| Plugin Category | Google Consent Signal                              |
+| --------------- | -------------------------------------------------- |
+| `analytics`     | `analytics_storage`                                |
 | `marketing`     | `ad_storage`, `ad_user_data`, `ad_personalization` |
 | `functional`    | `functionality_storage`, `personalization_storage` |
-| `necessary`     | `security_storage` (always granted) |
+| `necessary`     | `security_storage` (always granted)                |
 
 ## Custom Analytics Integration (PostHog, Plausible, etc.)
 
@@ -572,9 +662,11 @@ window.addEventListener('cookieConsentChange', (event) => {
   if (event.detail.analytics) {
     // Enable Plausible tracking
     delete window.plausible?.q // Clear any queued events
-    window.plausible = window.plausible || function() {
-      (window.plausible.q = window.plausible.q || []).push(arguments)
-    }
+    window.plausible =
+      window.plausible ||
+      function () {
+        ;(window.plausible.q = window.plausible.q || []).push(arguments)
+      }
   } else {
     // Disable tracking
     window.plausible = () => {} // No-op function

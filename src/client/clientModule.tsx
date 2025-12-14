@@ -58,6 +58,7 @@ function initCookieConsent() {
       storageKey={storageKey}
       googleConsentMode={options.googleConsentMode}
       onConsentChange={options.onConsentChange}
+      regionDetection={options.regionDetection}
     >
       <CookieConsentModal options={options} />
     </CookieConsentProvider>

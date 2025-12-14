@@ -1,6 +1,13 @@
 import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react'
-import type { CookieCategory, ConsentState, GoogleConsentModeConfig } from '../types'
+import type {
+  CookieCategory,
+  ConsentState,
+  GoogleConsentModeConfig,
+  RegionDetectionConfig,
+  RegionDetectionResult,
+} from '../types'
 import { initGoogleConsentMode, updateGoogleConsent } from './googleConsentMode'
+import { detectRegion } from './regionDetection'
 
 export type CookiePreferences = {
   necessary: boolean
@@ -14,6 +21,8 @@ export type CookiePreferences = {
 type CookieContextType = {
   preferences: CookiePreferences | null
   loading: boolean
+  regionDetectionResult: RegionDetectionResult | null
+  regionRequiresConsent: boolean
   hasConsent: () => boolean
   hasCategoryConsent: (category: CookieCategory) => boolean
   acceptAll: () => void
@@ -62,6 +71,8 @@ export function useCookieConsent() {
       return {
         preferences: null,
         loading: true,
+        regionDetectionResult: null,
+        regionRequiresConsent: true, // Default to requiring consent
         hasConsent: () => false,
         hasCategoryConsent: () => false,
         acceptAll: () => {},
@@ -81,6 +92,7 @@ type CookieConsentProviderProps = {
   storageKey?: string
   googleConsentMode?: GoogleConsentModeConfig
   onConsentChange?: (consent: ConsentState) => void
+  regionDetection?: RegionDetectionConfig
 }
 
 export function CookieConsentProvider({
@@ -88,10 +100,16 @@ export function CookieConsentProvider({
   storageKey = 'cookie-consent-preferences',
   googleConsentMode,
   onConsentChange,
+  regionDetection,
 }: CookieConsentProviderProps) {
   const [preferences, setPreferences] = useState<CookiePreferences | null>(null)
   const [loading, setLoading] = useState(true)
+  const [regionDetectionResult, setRegionDetectionResult] = useState<RegionDetectionResult | null>(
+    null
+  )
+  const [regionRequiresConsent, setRegionRequiresConsent] = useState(true)
   const initializedRef = useRef(false)
+  const regionDetectionRef = useRef(false)
 
   // Initialize Google Consent Mode as early as possible (before GTM loads)
   useEffect(() => {
@@ -121,6 +139,36 @@ export function CookieConsentProvider({
 
     initGoogleConsentMode(googleConsentMode, storedConsent)
   }, [googleConsentMode, storageKey])
+
+  // Region detection
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (regionDetectionRef.current) return
+    if (!regionDetection?.enabled) {
+      // Region detection disabled, always require consent
+      setRegionRequiresConsent(true)
+      return
+    }
+
+    regionDetectionRef.current = true
+
+    const runDetection = async () => {
+      try {
+        const result = await detectRegion(regionDetection)
+        setRegionDetectionResult(result)
+        setRegionRequiresConsent(result.requiresConsent)
+
+        // Call the callback if provided
+        regionDetection.onRegionDetected?.(result)
+      } catch (error) {
+        console.warn('[docusaurus-plugin-cookie-consent] Region detection failed:', error)
+        // On error, default to requiring consent (safer for compliance)
+        setRegionRequiresConsent(regionDetection.fallbackBehavior !== 'hide')
+      }
+    }
+
+    runDetection()
+  }, [regionDetection])
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -295,6 +343,8 @@ export function CookieConsentProvider({
   const value: CookieContextType = {
     preferences,
     loading,
+    regionDetectionResult,
+    regionRequiresConsent,
     hasConsent,
     hasCategoryConsent,
     acceptAll,

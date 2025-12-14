@@ -7,7 +7,12 @@ export type {
   CookieConsentLink,
   ConsentState,
   GoogleConsentModeConfig,
+  RegionDetectionConfig,
+  RegionDetectionResult,
+  GDPRCountry,
 } from './types'
+
+export { GDPR_COUNTRIES } from './types'
 
 // Export hooks for use in user components
 export { useCookieConsent } from './client/Provider'
@@ -19,3 +24,6 @@ export {
   updateGoogleConsent,
   initGoogleConsentMode,
 } from './client/googleConsentMode'
+
+// Export region detection utilities
+export { detectRegion, isGDPRCountry, clearRegionCache } from './client/regionDetection'

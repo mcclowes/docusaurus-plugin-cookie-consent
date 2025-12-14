@@ -68,11 +68,15 @@ const resolveTypeScriptThemePath = () => {
 }
 
 type ResolvedCookieConsentOptions = Required<
-  Omit<CookieConsentOptions, 'categories' | 'googleConsentMode' | 'onConsentChange'>
+  Omit<
+    CookieConsentOptions,
+    'categories' | 'googleConsentMode' | 'onConsentChange' | 'regionDetection'
+  >
 > & {
   categories?: CookieConsentOptions['categories']
   googleConsentMode?: CookieConsentOptions['googleConsentMode']
   onConsentChange?: CookieConsentOptions['onConsentChange']
+  regionDetection?: CookieConsentOptions['regionDetection']
 }
 
 type CookieConsentPluginContent = {
@@ -101,6 +105,7 @@ export default function cookieConsentPlugin(
     categories: options.categories,
     googleConsentMode: options.googleConsentMode,
     onConsentChange: options.onConsentChange,
+    regionDetection: options.regionDetection,
   }
 
   return {
