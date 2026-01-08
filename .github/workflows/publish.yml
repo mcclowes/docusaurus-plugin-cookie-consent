@@ -1,32 +1,36 @@
-name: Publish to npm
+name: Release
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 permissions:
-  contents: read
+  contents: write
+  id-token: write
 
 jobs:
-  publish:
-    name: Publish package
-    if: github.repository_owner == 'mcclowes'
+  release:
+    name: Release
     runs-on: ubuntu-latest
+    environment: Production
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: 'npm'
-          registry-url: https://registry.npmjs.org/
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm for OIDC support
+        run: npm install -g npm@latest
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build package
         run: npm run build
@@ -34,17 +38,26 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Verify tag matches package version
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Validate version matches tag
         run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          TAG_VERSION=${GITHUB_REF#refs/tags/}
-          if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ] && [ "$TAG_VERSION" != "v$PACKAGE_VERSION" ]; then
-            echo "Tag version ($TAG_VERSION) does not match package.json version ($PACKAGE_VERSION)"
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "Error: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
             exit 1
           fi
 
-      - name: Publish to npm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public
+      - name: Publish to npm with provenance
+        run: |
+          if [[ "$GITHUB_REF" == *"-alpha"* ]] || [[ "$GITHUB_REF" == *"-beta"* ]] || [[ "$GITHUB_REF" == *"-rc"* ]]; then
+            npm publish --provenance --access public --tag next
+          else
+            npm publish --provenance --access public
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-rc') }}
