@@ -148,6 +148,7 @@
     box-shadow 0.12s ease,
     background-color 0.2s;
   font-family: var(--ifm-font-family-base, inherit);
+  white-space: nowrap;
 }
 
 .cookie-consent-button:disabled {
