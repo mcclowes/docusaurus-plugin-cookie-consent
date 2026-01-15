@@ -17,8 +17,7 @@
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
-  background: white;
-  background-color: var(--ifm-background-color);
+  background-color: var(--ifm-background-color, white);
   border-radius: 8px;
   border: 1px solid #eee;
   box-shadow:
@@ -156,6 +155,20 @@
   cursor: not-allowed;
 }
 
+.cookie-consent-button:focus {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.cookie-consent-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.cookie-consent-button:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
 /* Primary button (Accept) */
 .cookie-consent-buttonPrimary {
   background-color: var(--ifm-color-primary);
@@ -221,6 +234,14 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* External link icon */
+.cookie-consent-external-link-icon {
+  display: inline-block;
+  margin-left: 4px;
+  vertical-align: middle;
+  opacity: 0.7;
 }
 
 /* Responsive adjustments */

@@ -7,6 +7,7 @@ This document outlines identified improvements for the `docusaurus-plugin-cookie
 ### 1. CSS Class Name Mismatch - FIXED
 
 All CSS class names in `Modal.css` now match the JavaScript styles object in `Modal.tsx`:
+
 - `cookie-consent-toast-overlay`
 - `cookie-consent-details`, `cookie-consent-details-title`
 - `cookie-consent-category-label`, `cookie-consent-category-required`, `cookie-consent-category-description`
@@ -16,6 +17,7 @@ All CSS class names in `Modal.css` now match the JavaScript styles object in `Mo
 ### 2. Hardcoded storageKey in Root.tsx - FIXED
 
 `Root.tsx` now uses the configured `storageKey` from plugin options:
+
 ```tsx
 const storageKey = pluginData?.options?.storageKey ?? 'cookie-consent-preferences'
 ```
@@ -31,6 +33,7 @@ Test file now uses correct `CookieConsentLink` type properties (`label`/`href` i
 ### 5. Test Coverage - SIGNIFICANTLY IMPROVED
 
 Added comprehensive test suite:
+
 - **Provider.test.tsx** (11 tests): Context provider, localStorage, all hook methods, error handling
 - **Modal.test.tsx** (20 tests): Rendering, button interactions, keyboard navigation, ARIA attributes, toast mode
 
@@ -39,6 +42,7 @@ Total: **34 tests** (up from 3)
 ### 6. ESLint Configuration - ADDED
 
 Added `eslint.config.js` with TypeScript and React plugins. New npm scripts:
+
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Auto-fix ESLint issues
 
@@ -69,6 +73,7 @@ Added `validatePreferences()` function that validates stored data shape and remo
 #### 1. Event Callbacks for Analytics Integration - DONE
 
 Added `onConsentChange` callback to `CookieConsentOptions`:
+
 ```ts
 onConsentChange?: (consent: ConsentState) => void
 ```
@@ -78,6 +83,7 @@ Also added full Google Consent Mode v2 integration via `googleConsentMode` optio
 #### 2. Consent Expiry/Refresh
 
 Add optional consent expiry that re-prompts users after a configurable period:
+
 ```ts
 consentExpiryDays?: number  // e.g., 365 days
 ```
@@ -102,7 +108,7 @@ Added full Tab/Shift+Tab focus cycling within the modal.
 
 ```tsx
 export const COOKIE_CATEGORIES = ['necessary', 'analytics', 'marketing', 'functional'] as const
-export type CookieCategory = typeof COOKIE_CATEGORIES[number]
+export type CookieCategory = (typeof COOKIE_CATEGORIES)[number]
 ```
 
 #### 2. Export Additional Types
@@ -147,19 +153,19 @@ Document breaking changes between major versions.
 
 ## Summary
 
-| Status | Issue | Priority |
-|--------|-------|----------|
-| **DONE** | Fix CSS class name mismatch | Critical |
-| **DONE** | Fix hardcoded storageKey in Root.tsx | Critical |
-| **DONE** | Fix test type mismatch | High |
-| **DONE** | Fix hasCategoryConsent for necessary | High |
-| **DONE** | Add React component tests | High |
-| **DONE** | Add ESLint | Medium |
-| **DONE** | Add event callbacks (onConsentChange, Google Consent Mode) | Medium |
-| **DONE** | Implement focus trap | Medium |
-| **DONE** | Validate stored preferences | Medium |
-| **DONE** | Custom DOM event dispatch | Medium |
-| Pending | Add consent expiry | Medium |
-| Pending | Refactor duplicated code | Low |
-| Pending | Add coverage reporting | Low |
-| Pending | Add pre-commit hooks | Low |
+| Status   | Issue                                                      | Priority |
+| -------- | ---------------------------------------------------------- | -------- |
+| **DONE** | Fix CSS class name mismatch                                | Critical |
+| **DONE** | Fix hardcoded storageKey in Root.tsx                       | Critical |
+| **DONE** | Fix test type mismatch                                     | High     |
+| **DONE** | Fix hasCategoryConsent for necessary                       | High     |
+| **DONE** | Add React component tests                                  | High     |
+| **DONE** | Add ESLint                                                 | Medium   |
+| **DONE** | Add event callbacks (onConsentChange, Google Consent Mode) | Medium   |
+| **DONE** | Implement focus trap                                       | Medium   |
+| **DONE** | Validate stored preferences                                | Medium   |
+| **DONE** | Custom DOM event dispatch                                  | Medium   |
+| Pending  | Add consent expiry                                         | Medium   |
+| Pending  | Refactor duplicated code                                   | Low      |
+| Pending  | Add coverage reporting                                     | Low      |
+| Pending  | Add pre-commit hooks                                       | Low      |

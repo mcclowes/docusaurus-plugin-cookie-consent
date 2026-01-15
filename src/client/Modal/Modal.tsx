@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useCookieConsent } from './Provider'
-import type { CookieConsentOptions, CookieCategory } from '../types'
+import { useCookieConsent } from '../Provider'
+import type { CookieConsentOptions, CookieCategory } from '../../types'
 
 // Define class names as constants
 const styles = {
@@ -24,6 +24,28 @@ const styles = {
   categoryRequired: 'cookie-consent-category-required',
   categoryDescription: 'cookie-consent-category-description',
   srOnly: 'cookie-consent-sr-only',
+  externalLinkIcon: 'cookie-consent-external-link-icon',
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg
+      className={styles.externalLinkIcon}
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  )
 }
 
 type CookieConsentModalProps = {
@@ -132,6 +154,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
             aria-label={`${linkText} (opens in new tab)`}
           >
             {linkText}
+            <ExternalLinkIcon />
             <span className={styles.srOnly}> (opens in new tab)</span>
           </a>
         )
@@ -199,7 +222,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
         tabIndex={-1}
       >
         <h2 id="cookie-consent-title" className={styles.title}>
-          {options.title || 'Cookie Consent'}
+          {options.title || 'Cookie consent'}
         </h2>
 
         <div id="cookie-consent-description" className={styles.description}>
@@ -220,6 +243,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
                 aria-label={`${link.label} (opens in new tab)`}
               >
                 {link.label}
+                <ExternalLinkIcon />
                 <span className={styles.srOnly}> (opens in new tab)</span>
               </a>
             ))}
@@ -256,7 +280,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
             className={`${styles.button} ${styles.buttonPrimary}`}
             type="button"
           >
-            {options.acceptAllText || 'Accept All'}
+            {options.acceptAllText || 'Accept all'}
           </button>
 
           {options.rejectOptionalText && (
@@ -274,16 +298,18 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
             className={`${styles.button} ${styles.buttonSecondary}`}
             type="button"
           >
-            {options.rejectAllText || 'Reject All'}
+            {options.rejectAllText || 'Reject all'}
           </button>
 
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className={`${styles.button} ${styles.buttonText}`}
-            type="button"
-          >
-            {showDetails ? 'Hide Details' : 'Show Details'}
-          </button>
+          {options.showDetailsButton !== false && (
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className={`${styles.button} ${styles.buttonText}`}
+              type="button"
+            >
+              {showDetails ? 'Hide details' : 'Show details'}
+            </button>
+          )}
         </div>
       </div>
     </>

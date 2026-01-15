@@ -4,7 +4,7 @@ import useGlobalData from '@docusaurus/useGlobalData'
 import { CookieConsentProvider } from '../client/Provider'
 import { CookieConsentModal } from '../client/Modal'
 import type { CookieConsentOptions } from '../types'
-import '../client/Modal.css'
+import '../client/Modal/Modal.css'
 
 export default function Root({ children }: { children: React.ReactNode }) {
   const globalData = useGlobalData()

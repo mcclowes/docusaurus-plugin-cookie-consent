@@ -85,6 +85,11 @@ export type CookieConsentOptions = {
     }
   }
   /**
+   * Show the "Show Details" button to expand cookie category details.
+   * @default true
+   */
+  showDetailsButton?: boolean
+  /**
    * Google Consent Mode v2 configuration.
    * When enabled, the plugin integrates with Google's consent framework
    * to control GTM, GA4, and Google Ads based on user consent.

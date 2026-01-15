@@ -8,7 +8,7 @@ import { CookieConsentProvider } from './Provider'
 import { CookieConsentModal } from './Modal'
 import { setDefaultConsent } from './googleConsentMode'
 import type { CookieConsentOptions } from '../types'
-import './Modal.css'
+import './Modal/Modal.css'
 
 // Type for Docusaurus window global
 interface DocusaurusWindow extends Window {

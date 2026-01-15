@@ -476,12 +476,12 @@ Tags configured this way will only fire after the user grants consent.
 
 ### Consent Mode Mapping
 
-| Plugin Category | Google Consent Signal    |
-| --------------- | ------------------------ |
-| `analytics`     | `analytics_storage`      |
+| Plugin Category | Google Consent Signal                              |
+| --------------- | -------------------------------------------------- |
+| `analytics`     | `analytics_storage`                                |
 | `marketing`     | `ad_storage`, `ad_user_data`, `ad_personalization` |
 | `functional`    | `functionality_storage`, `personalization_storage` |
-| `necessary`     | `security_storage` (always granted) |
+| `necessary`     | `security_storage` (always granted)                |
 
 ## Custom Analytics Integration (PostHog, Plausible, etc.)
 
@@ -572,9 +572,11 @@ window.addEventListener('cookieConsentChange', (event) => {
   if (event.detail.analytics) {
     // Enable Plausible tracking
     delete window.plausible?.q // Clear any queued events
-    window.plausible = window.plausible || function() {
-      (window.plausible.q = window.plausible.q || []).push(arguments)
-    }
+    window.plausible =
+      window.plausible ||
+      function () {
+        ;(window.plausible.q = window.plausible.q || []).push(arguments)
+      }
   } else {
     // Disable tracking
     window.plausible = () => {} // No-op function

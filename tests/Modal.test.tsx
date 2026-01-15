@@ -78,7 +78,7 @@ describe('CookieConsentModal', () => {
     expect(screen.getByRole('button', { name: 'Accept All' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reject All' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reject Optional' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Show Details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Show details' })).toBeInTheDocument()
   })
 
   it('hides reject optional button when text not provided', async () => {
@@ -143,7 +143,7 @@ describe('CookieConsentModal', () => {
     expect(screen.queryByText('Cookie Categories')).not.toBeInTheDocument()
 
     // Click show details
-    await user.click(screen.getByRole('button', { name: 'Show Details' }))
+    await user.click(screen.getByRole('button', { name: 'Show details' }))
 
     await vi.waitFor(() => {
       expect(screen.getByText('Cookie Categories')).toBeInTheDocument()
@@ -154,10 +154,10 @@ describe('CookieConsentModal', () => {
     expect(screen.getByText('Functional')).toBeInTheDocument()
 
     // Button text should change
-    expect(screen.getByRole('button', { name: 'Hide Details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Hide details' })).toBeInTheDocument()
 
     // Click hide details
-    await user.click(screen.getByRole('button', { name: 'Hide Details' }))
+    await user.click(screen.getByRole('button', { name: 'Hide details' }))
 
     await vi.waitFor(() => {
       expect(screen.queryByText('Cookie Categories')).not.toBeInTheDocument()
@@ -181,7 +181,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Show Details' }))
+    await user.click(screen.getByRole('button', { name: 'Show details' }))
 
     await vi.waitFor(() => {
       expect(screen.getByText('Custom Analytics')).toBeInTheDocument()
@@ -206,7 +206,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Show Details' }))
+    await user.click(screen.getByRole('button', { name: 'Show details' }))
 
     await vi.waitFor(() => {
       expect(screen.getByText('Cookie Categories')).toBeInTheDocument()
@@ -351,7 +351,9 @@ describe('CookieConsentModal', () => {
     })
 
     // Overlay should not be present (only toast-overlay class would be used if any)
-    const overlay = document.querySelector('.cookie-consent-overlay:not(.cookie-consent-toast-overlay)')
+    const overlay = document.querySelector(
+      '.cookie-consent-overlay:not(.cookie-consent-toast-overlay)'
+    )
     expect(overlay).not.toBeInTheDocument()
   })
 
@@ -363,7 +365,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Show Details' }))
+    await user.click(screen.getByRole('button', { name: 'Show details' }))
 
     await vi.waitFor(() => {
       expect(screen.getByText('(Required)')).toBeInTheDocument()
