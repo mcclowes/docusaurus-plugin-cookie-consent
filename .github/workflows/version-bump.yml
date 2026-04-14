@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -56,16 +57,22 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "Bumped version to $NEW_VERSION"
 
-      - name: Commit version bump
-        run: |
-          git add package.json package-lock.json
-          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: version-bump/${{ steps.version.outputs.new_version }}
+          base: main
+          commit-message: "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          title: "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          body: |
+            Automated version bump to `${{ steps.version.outputs.new_version }}`.
 
-      - name: Push changes to main
-        run: |
-          git push origin HEAD:main
-
-      - name: Create and push tag
-        run: |
-          git tag ${{ steps.version.outputs.new_version }}
-          git push origin ${{ steps.version.outputs.new_version }}
+            After merging, create and push a matching git tag to trigger publish:
+            ```
+            git tag ${{ steps.version.outputs.new_version }}
+            git push origin ${{ steps.version.outputs.new_version }}
+            ```
+          add-paths: |
+            package.json
+            package-lock.json
