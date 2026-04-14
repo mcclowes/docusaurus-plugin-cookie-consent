@@ -45,3 +45,6 @@ tmp/
 temp/
 
 .docusaurus/
+
+# Coverage profiling
+*.profraw
