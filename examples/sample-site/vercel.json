@@ -1,0 +1,6 @@
+{
+  "installCommand": "cd ../.. && npm install && npm run build && cd examples/sample-site && npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "framework": null
+}
