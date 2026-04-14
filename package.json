@@ -66,6 +66,14 @@
     "typescript-eslint": "^8.15.0",
     "vitest": "^4.0.8"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcclowes/docusaurus-plugin-cookie-consent.git"
+  },
+  "homepage": "https://github.com/mcclowes/docusaurus-plugin-cookie-consent#readme",
+  "bugs": {
+    "url": "https://github.com/mcclowes/docusaurus-plugin-cookie-consent/issues"
+  },
   "keywords": [
     "docusaurus",
     "plugin",
