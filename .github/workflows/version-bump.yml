@@ -63,16 +63,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: version-bump/${{ steps.version.outputs.new_version }}
           base: main
-          commit-message: "chore: bump version to ${{ steps.version.outputs.new_version }}"
-          title: "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          commit-message: 'chore: bump version to ${{ steps.version.outputs.new_version }}'
+          title: 'chore: bump version to ${{ steps.version.outputs.new_version }}'
           body: |
             Automated version bump to `${{ steps.version.outputs.new_version }}`.
 
-            After merging, create and push a matching git tag to trigger publish:
-            ```
-            git tag ${{ steps.version.outputs.new_version }}
-            git push origin ${{ steps.version.outputs.new_version }}
-            ```
+            On merge to `main`, the Release workflow will tag and publish to npm automatically.
           add-paths: |
             package.json
             package-lock.json
