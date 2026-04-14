@@ -23,7 +23,10 @@ if (ExecutionEnvironment.canUseDOM) {
   const globalData = (window as DocusaurusWindow)?.docusaurus?.globalData
   const options = globalData?.['docusaurus-plugin-cookie-consent']?.default?.options
 
-  if (options?.googleConsentMode?.enabled) {
+  if (
+    options?.googleConsentMode?.enabled &&
+    !(window as unknown as { __cookieConsentDefaultsSet?: boolean }).__cookieConsentDefaultsSet
+  ) {
     setDefaultConsent(options.googleConsentMode)
   }
 }

@@ -140,5 +140,60 @@ export default function cookieConsentPlugin(
       if (!resolvedOptions.enabled) return []
       return [clientModulePath]
     },
+
+    injectHtmlTags() {
+      if (!resolvedOptions.enabled) return {}
+      const gcm = resolvedOptions.googleConsentMode
+      if (!gcm?.enabled) return {}
+
+      const waitForUpdate = Number(gcm.waitForUpdate ?? 500)
+      const adsRedaction = gcm.adsDataRedaction !== false
+      const urlPassthrough = !!gcm.urlPassthrough
+      const storageKey = JSON.stringify(resolvedOptions.storageKey)
+
+      const innerHTML = `
+(function(){
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  if (window.__cookieConsentDefaultsSet) return;
+  window.__cookieConsentDefaultsSet = true;
+  window.gtag = window.gtag || gtag;
+  gtag('consent','default',{
+    ad_storage:'denied',
+    ad_user_data:'denied',
+    ad_personalization:'denied',
+    analytics_storage:'denied',
+    functionality_storage:'denied',
+    personalization_storage:'denied',
+    security_storage:'granted',
+    wait_for_update: ${waitForUpdate}
+  });
+  ${adsRedaction ? "gtag('set','ads_data_redaction',true);" : ''}
+  ${urlPassthrough ? "gtag('set','url_passthrough',true);" : ''}
+  try {
+    var raw = localStorage.getItem(${storageKey});
+    if (raw) {
+      var c = JSON.parse(raw);
+      gtag('consent','update',{
+        ad_storage: c.marketing ? 'granted':'denied',
+        ad_user_data: c.marketing ? 'granted':'denied',
+        ad_personalization: c.marketing ? 'granted':'denied',
+        analytics_storage: c.analytics ? 'granted':'denied',
+        functionality_storage: c.functional ? 'granted':'denied',
+        personalization_storage: c.functional ? 'granted':'denied'
+      });
+    }
+  } catch (e) {}
+})();`
+
+      return {
+        headTags: [
+          {
+            tagName: 'script',
+            innerHTML,
+          },
+        ],
+      }
+    },
   }
 }
