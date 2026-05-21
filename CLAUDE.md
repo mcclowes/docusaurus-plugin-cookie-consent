@@ -52,3 +52,14 @@ Tests in `tests/` directory using Vitest. Run with `npm test`.
 - `ACCESSIBILITY.md` - A11y features and line references
 - `CONTRIBUTING.md` - Development setup
 - `IMPROVEMENTS.md` - Remaining improvement ideas
+
+## Shared docs site
+
+User-facing changes in this repo should also be reflected in the shared documentation site at `~/Development/docusaurus/docusaurus-plugins-docs/` (separate repo; documents and dogfoods every plugin in this family).
+
+After a change that a consumer can observe — new option, changed default, renamed export, new/removed hook, changed behavior — update both:
+
+- `README.md` here (canonical API reference)
+- `docs/cookie-consent/` in `docusaurus-plugins-docs`, at minimum `configuration.md`; also `overview.md` / `getting-started.md` / `hook.md` / the relevant `advanced/*.md` (categories, Google Consent Mode, custom analytics) when the change reaches those topics
+
+Internal refactors, test-only changes, and build tweaks don't need docs-site updates.
