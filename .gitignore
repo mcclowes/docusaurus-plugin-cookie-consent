@@ -48,3 +48,6 @@ temp/
 
 # Coverage profiling
 *.profraw
+
+# Claude Code local settings
+.claude/settings.local.json
