@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Widened `react` and `react-dom` peer dependency ranges to `^18.2.0 || ^19.0.0`, adding React 19 support. Validated against React 19.2.7 (typecheck, build, and full test suite pass).
+
 ## [4.1.0] - 2024-12-12
 
 ### Added
