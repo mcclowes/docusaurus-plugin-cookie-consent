@@ -21,9 +21,10 @@ A cookie consent modal/toast component for Docusaurus sites with configurable te
 
 ## Compatibility
 
-| Plugin version | Docusaurus                       | React     |
-| -------------- | -------------------------------- | --------- |
-| `4.5.x`        | `^3.0.0` (tested up to `3.10.1`) | `^18.2.0` |
+| Plugin version | Docusaurus                       | React                  |
+| -------------- | -------------------------------- | ---------------------- |
+| `>= 4.5.2`     | `^3.0.0` (tested up to `3.10.1`) | `^18.2.0 \|\| ^19.0.0` |
+| `<= 4.5.1`     | `^3.0.0` (tested up to `3.10.1`) | `^18.2.0`              |
 
 ## Installation
 
