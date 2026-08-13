@@ -35,6 +35,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run --pool=threads --maxWorkers=1 --no-file-parallelism",
+    "test:coverage": "npm test -- --coverage",
     "test:watch": "vitest --pool=threads --maxWorkers=1 --no-file-parallelism",
     "prepare": "husky",
     "prepublishOnly": "npm run build"
@@ -55,6 +56,7 @@
     "@types/node": "^22.8.7",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.15.0",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
