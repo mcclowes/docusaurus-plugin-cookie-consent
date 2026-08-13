@@ -171,41 +171,41 @@
 }
 
 /* Primary button (Accept) */
-.cookie-consent-buttonPrimary {
+.cookie-consent-button-primary {
   background-color: var(--ifm-color-primary);
   color: var(--ifm-font-color-base-inverse, #ffffff);
   border: none;
 }
 
-.cookie-consent-buttonPrimary:hover:not(:disabled) {
+.cookie-consent-button-primary:hover:not(:disabled) {
   background-color: var(--ifm-color-primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--ifm-global-shadow-md);
 }
 
-.cookie-consent-buttonPrimary:active:not(:disabled) {
+.cookie-consent-button-primary:active:not(:disabled) {
   transform: translateY(0);
 }
 
-/* Secondary button (Reject Optional, Reject All) */
-.cookie-consent-buttonSecondary {
+/* Secondary button (reject optional cookies) */
+.cookie-consent-button-secondary {
   background-color: var(--ifm-color-secondary, var(--ifm-color-emphasis-200));
   color: var(--ifm-font-color-base-inverse, var(--ifm-font-color-base));
   border: none;
 }
 
-.cookie-consent-buttonSecondary:hover:not(:disabled) {
+.cookie-consent-button-secondary:hover:not(:disabled) {
   background-color: var(--ifm-color-secondary-dark, var(--ifm-color-emphasis-300));
   transform: translateY(-1px);
   box-shadow: var(--ifm-global-shadow-md);
 }
 
-.cookie-consent-buttonSecondary:active:not(:disabled) {
+.cookie-consent-button-secondary:active:not(:disabled) {
   transform: translateY(0);
 }
 
 /* Text button (Show/Hide Details) */
-.cookie-consent-buttonText {
+.cookie-consent-button-text {
   background-color: transparent;
   color: var(--ifm-link-color);
   border: none;
@@ -213,7 +213,7 @@
   font-weight: var(--ifm-font-weight-base, 400);
 }
 
-.cookie-consent-buttonText:hover:not(:disabled) {
+.cookie-consent-button-text:hover:not(:disabled) {
   color: var(--ifm-link-hover-color);
   opacity: 0.8;
 }

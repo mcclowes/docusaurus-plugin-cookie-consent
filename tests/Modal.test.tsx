@@ -2,6 +2,7 @@
  * @vitest-environment jsdom
  */
 import React from 'react'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -47,6 +48,14 @@ describe('CookieConsentModal', () => {
     })
     expect(screen.getByText('Cookie Consent')).toBeInTheDocument()
     expect(screen.getByText('We use cookies to enhance your experience.')).toBeInTheDocument()
+  })
+
+  it('defines styles for every button modifier emitted by the component', () => {
+    const css = readFileSync('src/client/Modal/Modal.css', 'utf8')
+
+    expect(css).toContain('.cookie-consent-button-primary')
+    expect(css).toContain('.cookie-consent-button-secondary')
+    expect(css).toContain('.cookie-consent-button-text')
   })
 
   it('does not render when consent already given', async () => {
