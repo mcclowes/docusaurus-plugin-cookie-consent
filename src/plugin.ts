@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { LoadContext, Plugin } from '@docusaurus/types'
 import type { CookieConsentOptions } from './types'
+import { CONSENT_STORAGE_VERSION, MILLISECONDS_PER_DAY } from './consentStorage'
 
 const resolveThemePath = () => {
   try {
@@ -41,9 +42,13 @@ const resolveTypeScriptThemePath = () => {
 }
 
 type ResolvedCookieConsentOptions = Required<
-  Omit<CookieConsentOptions, 'categories' | 'googleConsentMode' | 'showDetailsButton'>
+  Omit<
+    CookieConsentOptions,
+    'categories' | 'consentExpiryDays' | 'googleConsentMode' | 'showDetailsButton'
+  >
 > & {
   categories?: CookieConsentOptions['categories']
+  consentExpiryDays?: CookieConsentOptions['consentExpiryDays']
   googleConsentMode?: CookieConsentOptions['googleConsentMode']
   showDetailsButton?: CookieConsentOptions['showDetailsButton']
 }
@@ -56,6 +61,13 @@ export default function cookieConsentPlugin(
   context: LoadContext,
   options: CookieConsentOptions = {}
 ): Plugin<CookieConsentPluginContent | undefined> {
+  if (
+    options.consentExpiryDays !== undefined &&
+    (!Number.isFinite(options.consentExpiryDays) || options.consentExpiryDays <= 0)
+  ) {
+    throw new Error('consentExpiryDays must be a positive number')
+  }
+
   const themePath = resolveThemePath()
   const typeScriptThemePath = resolveTypeScriptThemePath()
 
@@ -69,6 +81,7 @@ export default function cookieConsentPlugin(
     rejectOptionalText: options.rejectOptionalText ?? 'Reject optional',
     rejectAllText: options.rejectAllText ?? 'Reject all',
     storageKey: options.storageKey ?? 'cookie-consent-preferences',
+    consentExpiryDays: options.consentExpiryDays,
     toastMode: options.toastMode ?? false,
     showDetailsButton: options.showDetailsButton,
     categories: options.categories,
@@ -112,6 +125,10 @@ export default function cookieConsentPlugin(
       const adsRedaction = gcm.adsDataRedaction !== false
       const urlPassthrough = !!gcm.urlPassthrough
       const storageKey = JSON.stringify(resolvedOptions.storageKey)
+      const consentExpiryMs =
+        resolvedOptions.consentExpiryDays === undefined
+          ? 'null'
+          : String(resolvedOptions.consentExpiryDays * MILLISECONDS_PER_DAY)
 
       const innerHTML = `
 (function(){
@@ -136,7 +153,16 @@ export default function cookieConsentPlugin(
     var raw = localStorage.getItem(${storageKey});
     if (raw) {
       var c = JSON.parse(raw);
-      gtag('consent','update',{
+      var valid = c &&
+        (c.version === undefined || c.version === ${CONSENT_STORAGE_VERSION}) &&
+        c.necessary === true &&
+        typeof c.analytics === 'boolean' &&
+        typeof c.marketing === 'boolean' &&
+        typeof c.functional === 'boolean' &&
+        c.consentGiven === true &&
+        (${consentExpiryMs} === null ||
+          (typeof c.timestamp === 'number' && Date.now() - c.timestamp < ${consentExpiryMs}));
+      if (valid) gtag('consent','update',{
         ad_storage: c.marketing ? 'granted':'denied',
         ad_user_data: c.marketing ? 'granted':'denied',
         ad_personalization: c.marketing ? 'granted':'denied',

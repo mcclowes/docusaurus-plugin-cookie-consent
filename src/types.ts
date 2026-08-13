@@ -71,6 +71,11 @@ export type CookieConsentOptions = {
    */
   storageKey?: string
   /**
+   * Number of days before saved consent expires and the banner is shown again.
+   * Omit to keep consent until the user resets it.
+   */
+  consentExpiryDays?: number
+  /**
    * Show the modal as a toast (bottom of screen) instead of centered modal
    */
   toastMode?: boolean

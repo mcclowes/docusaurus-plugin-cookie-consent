@@ -63,4 +63,24 @@ describe('cookieConsentPlugin', () => {
     expect(() => JSON.stringify(content)).not.toThrow()
     expect(JSON.parse(JSON.stringify(content))).toEqual(content)
   })
+
+  it('rejects invalid consent expiry values', () => {
+    expect(() => cookieConsentPlugin(createContext(), { consentExpiryDays: 0 })).toThrow(
+      'consentExpiryDays must be a positive number'
+    )
+  })
+
+  it('only restores valid, unexpired consent in the injected head script', () => {
+    const plugin = cookieConsentPlugin(createContext(), {
+      consentExpiryDays: 30,
+      googleConsentMode: { enabled: true },
+    })
+
+    const tags = plugin.injectHtmlTags?.()
+    const script = tags && 'headTags' in tags ? tags.headTags?.[0]?.innerHTML : undefined
+
+    expect(script).toContain('c.version === 1')
+    expect(script).toContain('c.consentGiven === true')
+    expect(script).toContain('Date.now() - c.timestamp < 2592000000')
+  })
 })
