@@ -80,14 +80,12 @@ type CookieConsentProviderProps = {
   children: React.ReactNode
   storageKey?: string
   googleConsentMode?: GoogleConsentModeConfig
-  onConsentChange?: (consent: ConsentState) => void
 }
 
 export function CookieConsentProvider({
   children,
   storageKey = 'cookie-consent-preferences',
   googleConsentMode,
-  onConsentChange,
 }: CookieConsentProviderProps) {
   const [preferences, setPreferences] = useState<CookiePreferences | null>(null)
   const [loading, setLoading] = useState(true)
@@ -178,11 +176,8 @@ export function CookieConsentProvider({
           })
         )
       }
-
-      // Call custom callback if provided
-      onConsentChange?.(consentState)
     },
-    [googleConsentMode?.enabled, onConsentChange]
+    [googleConsentMode?.enabled]
   )
 
   // Update consent helper

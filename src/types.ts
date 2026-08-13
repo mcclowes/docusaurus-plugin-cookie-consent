@@ -95,9 +95,4 @@ export type CookieConsentOptions = {
    * to control GTM, GA4, and Google Ads based on user consent.
    */
   googleConsentMode?: GoogleConsentModeConfig
-  /**
-   * Callback fired when consent preferences change.
-   * Use this for custom integrations with other analytics/tracking tools.
-   */
-  onConsentChange?: (consent: ConsentState) => void
 }

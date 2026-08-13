@@ -4,33 +4,6 @@ import { fileURLToPath } from 'node:url'
 import type { LoadContext, Plugin } from '@docusaurus/types'
 import type { CookieConsentOptions } from './types'
 
-const resolveClientModulePath = (context: LoadContext) => {
-  // Prefer resolving through the installed package path so bundlers like Vite
-  // can treat it as a dependency under node_modules (required for CommonJS interop).
-  const nodeModulesPath = join(
-    context.siteDir,
-    'node_modules',
-    'docusaurus-plugin-cookie-consent',
-    'dist',
-    'client',
-    'clientModule.js'
-  )
-
-  if (existsSync(nodeModulesPath)) {
-    return nodeModulesPath
-  }
-
-  try {
-    if (typeof __dirname === 'string') {
-      return join(__dirname, 'client/clientModule.js')
-    }
-  } catch {
-    // noop - fall back to ESM resolution below
-  }
-
-  return fileURLToPath(new URL('./client/clientModule.js', import.meta.url))
-}
-
 const resolveThemePath = () => {
   try {
     if (typeof __dirname === 'string') {
@@ -68,14 +41,10 @@ const resolveTypeScriptThemePath = () => {
 }
 
 type ResolvedCookieConsentOptions = Required<
-  Omit<
-    CookieConsentOptions,
-    'categories' | 'googleConsentMode' | 'onConsentChange' | 'showDetailsButton'
-  >
+  Omit<CookieConsentOptions, 'categories' | 'googleConsentMode' | 'showDetailsButton'>
 > & {
   categories?: CookieConsentOptions['categories']
   googleConsentMode?: CookieConsentOptions['googleConsentMode']
-  onConsentChange?: CookieConsentOptions['onConsentChange']
   showDetailsButton?: CookieConsentOptions['showDetailsButton']
 }
 
@@ -87,7 +56,6 @@ export default function cookieConsentPlugin(
   context: LoadContext,
   options: CookieConsentOptions = {}
 ): Plugin<CookieConsentPluginContent | undefined> {
-  const clientModulePath = resolveClientModulePath(context)
   const themePath = resolveThemePath()
   const typeScriptThemePath = resolveTypeScriptThemePath()
 
@@ -105,7 +73,6 @@ export default function cookieConsentPlugin(
     showDetailsButton: options.showDetailsButton,
     categories: options.categories,
     googleConsentMode: options.googleConsentMode,
-    onConsentChange: options.onConsentChange,
   }
 
   return {
@@ -134,11 +101,6 @@ export default function cookieConsentPlugin(
       }
       const { setGlobalData } = actions
       setGlobalData(content)
-    },
-
-    getClientModules() {
-      if (!resolvedOptions.enabled) return []
-      return [clientModulePath]
     },
 
     injectHtmlTags() {

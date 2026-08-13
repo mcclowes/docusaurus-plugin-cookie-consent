@@ -15,7 +15,7 @@ describe('cookieConsentPlugin', () => {
     const content = await plugin.loadContent?.()
 
     expect(content).toBeUndefined()
-    expect(plugin.getClientModules?.()).toEqual([])
+    expect(plugin.getClientModules?.()).toBeUndefined()
   })
 
   it('resolves default options when enabled', async () => {
@@ -29,10 +29,7 @@ describe('cookieConsentPlugin', () => {
       storageKey: 'cookie-consent-preferences',
     })
 
-    const clientModules = plugin.getClientModules?.() ?? []
-    expect(clientModules).toHaveLength(1)
-    const normalizedPath = clientModules[0]!.replace(/\\/g, '/')
-    expect(normalizedPath).toMatch(/client\/clientModule\.js$/)
+    expect(plugin.getClientModules?.()).toBeUndefined()
   })
 
   it('sets global data with resolved options during contentLoaded', async () => {
@@ -54,5 +51,16 @@ describe('cookieConsentPlugin', () => {
     })
 
     expect(setGlobalData).toHaveBeenCalledWith(content)
+  })
+
+  it('only exposes JSON-serializable options as global data', async () => {
+    const plugin = cookieConsentPlugin(createContext(), {
+      title: 'Serializable options',
+    })
+
+    const content = await plugin.loadContent?.()
+
+    expect(() => JSON.stringify(content)).not.toThrow()
+    expect(JSON.parse(JSON.stringify(content))).toEqual(content)
   })
 })

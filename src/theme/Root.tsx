@@ -18,11 +18,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
   const storageKey = options?.storageKey ?? 'cookie-consent-preferences'
 
   return (
-    <CookieConsentProvider
-      storageKey={storageKey}
-      googleConsentMode={options?.googleConsentMode}
-      onConsentChange={options?.onConsentChange}
-    >
+    <CookieConsentProvider storageKey={storageKey} googleConsentMode={options?.googleConsentMode}>
       {children}
       {options && <BrowserOnly>{() => <CookieConsentModal options={options} />}</BrowserOnly>}
     </CookieConsentProvider>
