@@ -78,6 +78,11 @@ export default function cookieConsentPlugin(
     description: options.description ?? 'We use cookies to enhance your browsing experience.',
     links: options.links ?? [],
     acceptAllText: options.acceptAllText ?? 'Accept all',
+    rejectText:
+      options.rejectText ??
+      options.rejectOptionalText ??
+      options.rejectAllText ??
+      'Reject optional',
     rejectOptionalText: options.rejectOptionalText ?? 'Reject optional',
     rejectAllText: options.rejectAllText ?? 'Reject all',
     storageKey: options.storageKey ?? 'cookie-consent-preferences',

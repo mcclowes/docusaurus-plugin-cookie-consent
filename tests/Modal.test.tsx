@@ -76,12 +76,11 @@ describe('CookieConsentModal', () => {
     })
 
     expect(screen.getByRole('button', { name: 'Accept All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Reject All' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reject Optional' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Show details' })).toBeInTheDocument()
   })
 
-  it('hides reject optional button when text not provided', async () => {
+  it('falls back to legacy reject-all text', async () => {
     const options = { ...defaultOptions, rejectOptionalText: undefined }
     renderModal(options)
 
@@ -89,7 +88,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    expect(screen.queryByRole('button', { name: 'Reject Optional' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reject All' })).toBeInTheDocument()
   })
 
   it('closes modal on Accept All click', async () => {
@@ -112,7 +111,7 @@ describe('CookieConsentModal', () => {
     expect(stored.analytics).toBe(true)
   })
 
-  it('closes modal on Reject All click', async () => {
+  it('closes modal when optional cookies are rejected', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     renderModal()
 
@@ -120,7 +119,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Reject All' }))
+    await user.click(screen.getByRole('button', { name: 'Reject Optional' }))
 
     await vi.waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -376,8 +375,7 @@ describe('CookieConsentModal', () => {
     const options: CookieConsentOptions = {
       ...defaultOptions,
       acceptAllText: 'I Accept',
-      rejectAllText: 'No Thanks',
-      rejectOptionalText: 'Only Essential',
+      rejectText: 'Only Essential',
     }
     renderModal(options)
 
@@ -386,7 +384,6 @@ describe('CookieConsentModal', () => {
     })
 
     expect(screen.getByRole('button', { name: 'I Accept' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'No Thanks' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Only Essential' })).toBeInTheDocument()
   })
 })

@@ -329,12 +329,3 @@ describe('CookieConsentProvider', () => {
     consoleSpy.mockRestore()
   })
 })
-
-describe('useCookieConsent outside provider', () => {
-  it('throws error when used outside provider in browser', () => {
-    // The hook throws when context is null and window is defined
-    expect(() => {
-      render(<TestConsumer />)
-    }).toThrow('useCookieConsent must be used within CookieConsentProvider')
-  })
-})

@@ -59,11 +59,17 @@ export type CookieConsentOptions = {
    */
   acceptAllText?: string
   /**
+   * Text for the button that rejects all optional cookies.
+   */
+  rejectText?: string
+  /**
    * Text for the "Reject Optional" button (only rejects non-necessary cookies)
+   * @deprecated Use rejectText.
    */
   rejectOptionalText?: string
   /**
    * Text for the "Reject All" button (rejects all except necessary)
+   * @deprecated Use rejectText.
    */
   rejectAllText?: string
   /**

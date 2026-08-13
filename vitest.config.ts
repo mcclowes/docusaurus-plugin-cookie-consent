@@ -8,6 +8,8 @@ export default defineConfig({
         __dirname,
         './tests/mocks/ExecutionEnvironment.ts'
       ),
+      '@docusaurus/BrowserOnly': path.resolve(__dirname, './tests/mocks/BrowserOnly.tsx'),
+      '@docusaurus/useGlobalData': path.resolve(__dirname, './tests/mocks/useGlobalData.ts'),
     },
   },
   test: {

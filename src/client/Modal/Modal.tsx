@@ -53,7 +53,7 @@ type CookieConsentModalProps = {
 }
 
 export function CookieConsentModal({ options }: CookieConsentModalProps) {
-  const { preferences, loading, acceptAll, rejectOptional, rejectAll } = useCookieConsent()
+  const { preferences, loading, acceptAll, rejectOptional } = useCookieConsent()
   const [showDetails, setShowDetails] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
 
@@ -78,7 +78,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         // ESC key - treat as reject all
-        rejectAll()
+        rejectOptional()
         return
       }
 
@@ -122,7 +122,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = originalOverflow
     }
-  }, [shouldShow, rejectAll])
+  }, [shouldShow, rejectOptional])
 
   // Don't render modal if it shouldn't be shown
   if (!shouldShow) {
@@ -283,22 +283,15 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
             {options.acceptAllText || 'Accept all'}
           </button>
 
-          {options.rejectOptionalText && (
-            <button
-              onClick={rejectOptional}
-              className={`${styles.button} ${styles.buttonSecondary}`}
-              type="button"
-            >
-              {options.rejectOptionalText}
-            </button>
-          )}
-
           <button
-            onClick={rejectAll}
+            onClick={rejectOptional}
             className={`${styles.button} ${styles.buttonSecondary}`}
             type="button"
           >
-            {options.rejectAllText || 'Reject all'}
+            {options.rejectText ??
+              options.rejectOptionalText ??
+              options.rejectAllText ??
+              'Reject optional'}
           </button>
 
           {options.showDetailsButton !== false && (
