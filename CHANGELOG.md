@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Optional `consentExpiryDays` configuration with versioned stored preferences.
+- Coverage thresholds and a CI build that installs the packed release into the sample site.
+
+### Changed
+
+- Replaced the two identical rejection buttons with one `rejectText` action. The old text options remain as deprecated fallbacks.
+- Consent reset now immediately publishes denied optional consent to Google Consent Mode and browser integrations.
+- The theme root is now the only banner mount, keeping hooks and the dialog in one React provider.
+
+### Fixed
+
+- Matched button modifier selectors to the kebab-case classes emitted by the dialog.
+
+### Removed
+
+- Removed the `onConsentChange` configuration option because Docusaurus global data can't serialize functions. Use the `cookieConsentChange` browser event instead.
+
 ## [4.6.0] - 2026-06-02
 
 ### Changed
