@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-08-17
+
 ### Added
 
 - Browser-safe `readCookieConsent` and `subscribeToCookieConsent` utilities with initial and cross-tab updates.
