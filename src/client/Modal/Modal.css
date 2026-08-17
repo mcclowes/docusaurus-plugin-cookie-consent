@@ -12,18 +12,18 @@
 /* Modal container */
 .cookie-consent-modal {
   position: fixed;
-  bottom: 10px;
-  left: 10px;
-  max-width: 500px;
-  width: 90%;
+  bottom: 24px;
+  left: 24px;
+  max-width: 520px;
+  width: calc(100% - 48px);
   max-height: 90vh;
-  background-color: var(--ifm-background-color, white);
-  border-radius: 8px;
-  border: 1px solid #eee;
+  background-color: var(--ifm-background-surface-color, var(--ifm-background-color, #ffffff));
+  border-radius: 16px;
+  border: 1px solid var(--ifm-color-emphasis-300, #d4d4d8);
   box-shadow:
-    0 4px 8px 0 rgba(0, 0, 0, 0.2),
-    0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  padding: 2rem;
+    0 24px 48px -16px rgba(0, 0, 0, 0.35),
+    0 8px 20px -8px rgba(0, 0, 0, 0.25);
+  padding: 28px;
   overflow-y: auto;
   z-index: 10000;
   font-family: var(--ifm-font-family-base, system-ui, -apple-system, sans-serif);
@@ -33,11 +33,11 @@
 /* Toast mode - bottom banner instead of centered modal */
 .cookie-consent-toast {
   position: fixed;
-  bottom: 10px;
-  left: 10px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 400px;
+  bottom: 24px;
+  left: 24px;
+  max-width: 520px;
+  width: calc(100% - 48px);
+  max-height: calc(100vh - 48px);
   z-index: 10000;
 }
 
@@ -93,18 +93,19 @@
 
 /* Modal title */
 .cookie-consent-title {
-  margin: 0 0 16px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--ifm-heading-color, #1a1a1a);
+  margin: 0 0 10px 0;
+  font-size: 21px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: inherit;
 }
 
 /* Modal description */
 .cookie-consent-description {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   font-size: 14px;
-  line-height: 1.6;
-  color: var(--ifm-font-color-base, #4a4a4a);
+  line-height: 1.65;
+  color: var(--ifm-color-emphasis-700, #52525b);
 }
 
 .cookie-consent-description a {
@@ -118,16 +119,17 @@
 
 /* Links section */
 .cookie-consent-links {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 8px 18px;
 }
 
 .cookie-consent-links a {
   color: var(--ifm-link-color, #0066cc);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .cookie-consent-links a:hover {
@@ -136,10 +138,11 @@
 
 /* Details section */
 .cookie-consent-details {
-  margin-bottom: 20px;
-  padding: 16px;
-  background-color: var(--ifm-background-color, #f5f5f5);
-  border-radius: 4px;
+  margin: 0 0 20px;
+  padding: 16px 18px 4px;
+  background-color: var(--ifm-color-emphasis-100, #f4f4f5);
+  border: 1px solid var(--ifm-color-emphasis-200, #e4e4e7);
+  border-radius: 10px;
 }
 
 .cookie-consent-details-title {
@@ -172,18 +175,19 @@
 .cookie-consent-buttons {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .cookie-consent-buttons-toast {
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* Button base styles */
 .cookie-consent-button {
+  min-height: 44px;
   padding: var(--ifm-button-padding-vertical, 0.6rem) var(--ifm-button-padding-horizontal, 1.4rem);
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--ifm-button-border-radius, 0.5rem);
   font-size: var(--ifm-font-size-base, 14px);
   font-weight: var(--ifm-font-weight-semibold, 500);
@@ -217,9 +221,8 @@
 
 /* Primary button (Accept) */
 .cookie-consent-button-primary {
-  background-color: var(--ifm-color-primary);
-  color: var(--ifm-font-color-base-inverse, #ffffff);
-  border: none;
+  background-color: var(--ifm-color-primary, #5e35b1);
+  color: #ffffff;
 }
 
 .cookie-consent-button-primary:hover:not(:disabled) {
@@ -234,9 +237,9 @@
 
 /* Secondary button (reject optional cookies) */
 .cookie-consent-button-secondary {
-  background-color: var(--ifm-color-secondary, var(--ifm-color-emphasis-200));
-  color: var(--ifm-font-color-base-inverse, var(--ifm-font-color-base));
-  border: none;
+  background-color: var(--ifm-color-emphasis-100, #f4f4f5);
+  color: var(--ifm-font-color-base, #18181b);
+  border-color: var(--ifm-color-emphasis-300, #d4d4d8);
 }
 
 .cookie-consent-button-secondary:hover:not(:disabled) {
@@ -254,8 +257,8 @@
   background-color: transparent;
   color: var(--ifm-link-color);
   border: none;
-  text-decoration: underline;
-  font-weight: var(--ifm-font-weight-base, 400);
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .cookie-consent-button-text:hover:not(:disabled) {
@@ -265,8 +268,13 @@
 
 /* Toast mode button sizing */
 .cookie-consent-buttons-toast .cookie-consent-button {
-  flex: 1;
-  min-width: 120px;
+  min-width: 0;
+}
+
+.cookie-consent-buttons-toast .cookie-consent-button-text {
+  grid-column: 1 / -1;
+  min-height: 36px;
+  padding-block: 4px;
 }
 
 /* Screen reader only content */
@@ -293,15 +301,19 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .cookie-consent-modal {
-    width: 95%;
+    bottom: 12px;
+    left: 12px;
+    width: calc(100% - 24px);
     padding: 20px;
+    border-radius: 12px;
   }
 
   .cookie-consent-toast {
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    width: calc(100% - 20px);
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: calc(100% - 24px);
+    max-height: calc(100vh - 24px);
   }
 
   .cookie-consent-horizontal {
@@ -323,6 +335,7 @@
   }
 
   .cookie-consent-buttons-toast {
+    display: flex;
     flex-direction: column;
   }
 
