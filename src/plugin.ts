@@ -77,6 +77,8 @@ export default function cookieConsentPlugin(
     title: options.title ?? 'Cookie consent',
     description: options.description ?? 'We use cookies to enhance your browsing experience.',
     links: options.links ?? [],
+    preferencesHref: options.preferencesHref ?? '',
+    preferencesLinkText: options.preferencesLinkText ?? 'Manage preferences',
     acceptAllText: options.acceptAllText ?? 'Accept all',
     rejectText:
       options.rejectText ??

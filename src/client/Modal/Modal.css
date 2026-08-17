@@ -284,6 +284,60 @@
   opacity: 0.8;
 }
 
+a.cookie-consent-button-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Standalone preference form */
+.cookie-consent-preferences {
+  display: grid;
+  gap: 16px;
+  font-family: var(--ifm-font-family-base, system-ui, -apple-system, sans-serif);
+}
+
+.cookie-consent-preferences-category {
+  padding: 16px 18px;
+  background-color: var(--ifm-color-emphasis-100, #f4f4f5);
+  border: 1px solid var(--ifm-color-emphasis-200, #e4e4e7);
+  border-radius: 10px;
+}
+
+.cookie-consent-preferences-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cookie-consent-preferences-label:has(input:disabled) {
+  cursor: default;
+}
+
+.cookie-consent-preferences-label input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.cookie-consent-preferences-category .cookie-consent-category-description {
+  margin: 6px 0 0;
+}
+
+.cookie-consent-preferences-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cookie-consent-preferences-status {
+  font-size: 14px;
+  color: var(--ifm-color-emphasis-700, #52525b);
+}
+
 /* Toast mode button sizing */
 .cookie-consent-buttons-toast .cookie-consent-button {
   min-width: 0;

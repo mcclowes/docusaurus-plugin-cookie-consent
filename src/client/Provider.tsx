@@ -6,6 +6,7 @@ import {
   type CookiePreferences,
 } from '../consentStorage'
 import { initGoogleConsentMode, updateGoogleConsent } from './googleConsentMode'
+import { COOKIE_CONSENT_CHANGE_EVENT } from './consent'
 
 export type { CookiePreferences } from '../consentStorage'
 
@@ -142,7 +143,7 @@ export function CookieConsentProvider({
       // Dispatch custom DOM event for third-party integrations
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
-          new CustomEvent('cookieConsentChange', {
+          new CustomEvent(COOKIE_CONSENT_CHANGE_EVENT, {
             detail: consentState,
           })
         )

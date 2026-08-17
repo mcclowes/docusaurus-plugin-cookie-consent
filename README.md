@@ -86,6 +86,10 @@ See [API reference](docs/API.md) for the complete public API and [migration guid
     href: string
   }>
 
+  // Optional site-owned page for detailed category management
+  preferencesHref?: string
+  preferencesLinkText?: string // default: 'Manage preferences'
+
   // Button text customization
   acceptAllText?: string // default: 'Accept all'
   rejectText?: string    // default: 'Reject optional'
@@ -484,7 +488,7 @@ Tags configured this way will only fire after the user grants consent.
 
 ## Custom Analytics Integration (PostHog, Plausible, etc.)
 
-For analytics tools that don't support Google Consent Mode, the plugin dispatches a custom DOM event whenever consent changes. You can listen to this event to conditionally initialize or shutdown your analytics.
+For analytics tools that don't support Google Consent Mode, use the browser subscription API. It reports the current stored choice, same-page changes, and changes made in other tabs.
 
 ### The `cookieConsentChange` Event
 
@@ -513,7 +517,7 @@ Create a client module that listens for consent changes:
 // src/clientModules/posthog.js
 import posthog from 'posthog-js'
 
-const STORAGE_KEY = 'cookie-consent-preferences' // Match your plugin's storageKey
+import { subscribeToCookieConsent } from 'docusaurus-plugin-cookie-consent/client'
 
 let initialized = false
 
@@ -529,23 +533,16 @@ function shutdownPosthog() {
   initialized = false
 }
 
-// Listen for consent changes
-window.addEventListener('cookieConsentChange', (event) => {
-  if (event.detail.analytics) {
-    initPosthog()
-  } else {
-    shutdownPosthog()
-  }
-})
-
-// Check initial consent on page load
-const stored = localStorage.getItem(STORAGE_KEY)
-if (stored) {
-  const prefs = JSON.parse(stored)
-  if (prefs.analytics) {
-    initPosthog()
-  }
-}
+subscribeToCookieConsent(
+  (consent) => {
+    if (consent?.analytics) {
+      initPosthog()
+    } else {
+      shutdownPosthog()
+    }
+  },
+  { storageKey: 'cookie-consent-preferences' }
+)
 ```
 
 Register the client module in a custom plugin:

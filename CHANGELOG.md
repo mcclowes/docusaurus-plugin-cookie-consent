@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Browser-safe `readCookieConsent` and `subscribeToCookieConsent` utilities with initial and cross-tab updates.
+- `CookieConsentPreferences` for site-owned settings pages and `CookieConsentGate` for optional content.
+- `preferencesHref` and `preferencesLinkText` options for linking the banner to detailed settings.
+
+### Fixed
+
+- Accepting or saving preferences no longer grants categories configured with `enabled: false`.
+
 ## [4.7.0] - 2026-08-14
 
 ### Added

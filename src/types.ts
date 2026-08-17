@@ -55,6 +55,16 @@ export type CookieConsentOptions = {
    */
   links?: CookieConsentLink[]
   /**
+   * Site-owned page where visitors can manage individual cookie categories.
+   * The banner is suppressed on this exact path so the settings form remains accessible.
+   */
+  preferencesHref?: string
+  /**
+   * Text for the cookie settings link.
+   * @default 'Manage preferences'
+   */
+  preferencesLinkText?: string
+  /**
    * Text for the "Accept All" button
    */
   acceptAllText?: string

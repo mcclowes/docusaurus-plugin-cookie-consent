@@ -57,15 +57,19 @@ type CookieConsentModalProps = {
 }
 
 export function CookieConsentModal({ options }: CookieConsentModalProps) {
-  const { preferences, loading, acceptAll, rejectOptional } = useCookieConsent()
+  const { preferences, loading, updatePreferences, rejectOptional } = useCookieConsent()
   const [showDetails, setShowDetails] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
   const exitTimerRef = useRef<number | undefined>(undefined)
   const isHorizontal = options.orientation === 'horizontal'
+  const preferencesPath = options.preferencesHref?.replace(/\/$/, '') || undefined
+  const currentPath =
+    typeof window === 'undefined' ? undefined : window.location.pathname.replace(/\/$/, '')
+  const isPreferencesPage = preferencesPath !== undefined && currentPath === preferencesPath
 
   // Determine if modal should be shown
-  const shouldShow = !loading && !preferences?.consentGiven
+  const shouldShow = !loading && !preferences?.consentGiven && !isPreferencesPage
 
   useEffect(
     () => () => {
@@ -236,6 +240,15 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
     ? `${styles.buttons} ${styles.buttonsToast}`
     : styles.buttons
 
+  const acceptEnabledCategories = () => {
+    updatePreferences({
+      analytics: categories.analytics?.enabled !== false,
+      marketing: categories.marketing?.enabled !== false,
+      functional: categories.functional?.enabled !== false,
+      consentGiven: true,
+    })
+  }
+
   return (
     <>
       {/* Backdrop overlay */}
@@ -317,7 +330,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
 
         <div className={buttonsClass}>
           <button
-            onClick={() => dismiss(acceptAll)}
+            onClick={() => dismiss(acceptEnabledCategories)}
             className={`${styles.button} ${styles.buttonPrimary}`}
             type="button"
             disabled={isExiting}
@@ -346,6 +359,12 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
             >
               {showDetails ? 'Hide details' : 'Show details'}
             </button>
+          )}
+
+          {options.preferencesHref && (
+            <a className={`${styles.button} ${styles.buttonText}`} href={options.preferencesHref}>
+              {options.preferencesLinkText || 'Manage preferences'}
+            </a>
           )}
         </div>
       </div>

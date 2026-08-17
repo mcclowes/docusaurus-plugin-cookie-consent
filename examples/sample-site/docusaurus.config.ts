@@ -52,6 +52,8 @@ const config: Config = {
         acceptAllText: 'Accept all cookies',
         rejectText: 'Only necessary',
         consentExpiryDays: 180,
+        preferencesHref: '/cookie-settings',
+        preferencesLinkText: 'Manage cookie settings',
         links: [
           { label: 'Privacy policy', href: '/docs/privacy-policy' },
           { label: 'Cookie usage', href: '/docs/cookie-usage' },

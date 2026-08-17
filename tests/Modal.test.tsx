@@ -38,6 +38,7 @@ describe('CookieConsentModal', () => {
   afterEach(() => {
     vi.useRealTimers()
     document.body.style.overflow = ''
+    window.history.replaceState({}, '', '/')
   })
 
   it('renders modal when no consent given', async () => {
@@ -244,6 +245,24 @@ describe('CookieConsentModal', () => {
     expect(screen.getByText('Analytics')).toBeInTheDocument()
   })
 
+  it('does not grant a disabled category when accepting all', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    renderModal({
+      ...defaultOptions,
+      categories: {
+        marketing: { label: 'Marketing', enabled: false },
+      },
+    })
+
+    await user.click(await screen.findByRole('button', { name: 'Accept All' }))
+
+    expect(JSON.parse(localStorage.getItem('test-cookie-consent') || '{}')).toMatchObject({
+      analytics: true,
+      marketing: false,
+      functional: true,
+    })
+  })
+
   it('renders links when provided', async () => {
     const options: CookieConsentOptions = {
       ...defaultOptions,
@@ -265,6 +284,28 @@ describe('CookieConsentModal', () => {
 
     const cookieLink = screen.getByRole('link', { name: /Cookie Policy/i })
     expect(cookieLink).toHaveAttribute('href', '/cookies')
+  })
+
+  it('links to the site-owned preference page', async () => {
+    renderModal({
+      ...defaultOptions,
+      preferencesHref: '/cookie-settings',
+      preferencesLinkText: 'Cookie settings',
+    })
+
+    expect(await screen.findByRole('link', { name: 'Cookie settings' })).toHaveAttribute(
+      'href',
+      '/cookie-settings'
+    )
+  })
+
+  it('does not cover the preference page before consent is given', async () => {
+    window.history.replaceState({}, '', '/cookie-settings/')
+    renderModal({ ...defaultOptions, preferencesHref: '/cookie-settings' })
+
+    await vi.waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
   })
 
   it('focuses the primary consent action when links are present', async () => {
