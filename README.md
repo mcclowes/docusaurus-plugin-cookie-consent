@@ -98,6 +98,9 @@ See [API reference](docs/API.md) for the complete public API and [migration guid
 
   // Show as toast (bottom of screen) instead of centered modal (default: false)
   toastMode?: boolean
+
+  // Use the existing card or a full-width bottom banner (default: 'vertical')
+  orientation?: 'vertical' | 'horizontal'
 }
 ```
 
@@ -186,6 +189,7 @@ const config: Config = {
         acceptAllText: 'Accept All Cookies',
         rejectText: 'Essential only',
         toastMode: true, // Show as bottom toast instead of modal
+        orientation: 'horizontal', // Stretch the consent UI across the viewport
         storageKey: 'my-site-cookie-consent',
         consentExpiryDays: 180,
         categories: {

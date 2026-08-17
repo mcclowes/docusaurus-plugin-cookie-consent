@@ -27,6 +27,7 @@ describe('cookieConsentPlugin', () => {
       enabled: true,
       title: 'Cookie consent',
       storageKey: 'cookie-consent-preferences',
+      orientation: 'vertical',
     })
 
     expect(plugin.getClientModules?.()).toBeUndefined()

@@ -335,6 +335,29 @@ describe('CookieConsentModal', () => {
     expect(dialog.className).toContain('cookie-consent-toast')
   })
 
+  it('renders the horizontal banner without a backdrop', async () => {
+    document.body.style.overflow = 'auto'
+    renderModal({ ...defaultOptions, orientation: 'horizontal' })
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(screen.getByRole('dialog')).toHaveClass('cookie-consent-horizontal')
+    expect(document.querySelector('.cookie-consent-overlay')).not.toBeInTheDocument()
+    expect(document.body.style.overflow).toBe('auto')
+  })
+
+  it('keeps the existing vertical layout by default', async () => {
+    renderModal()
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(screen.getByRole('dialog')).not.toHaveClass('cookie-consent-horizontal')
+  })
+
   it('renders overlay in non-toast mode', async () => {
     renderModal()
 

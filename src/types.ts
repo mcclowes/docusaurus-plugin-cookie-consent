@@ -86,6 +86,12 @@ export type CookieConsentOptions = {
    */
   toastMode?: boolean
   /**
+   * Layout direction for the consent UI.
+   * Horizontal renders a full-width banner along the bottom of the viewport.
+   * @default 'vertical'
+   */
+  orientation?: 'vertical' | 'horizontal'
+  /**
    * Cookie categories and their descriptions
    */
   categories?: {

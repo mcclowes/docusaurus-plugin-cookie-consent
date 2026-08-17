@@ -8,6 +8,8 @@ const styles = {
   toastOverlay: 'cookie-consent-toast-overlay',
   modal: 'cookie-consent-modal',
   toast: 'cookie-consent-toast',
+  horizontal: 'cookie-consent-horizontal',
+  content: 'cookie-consent-content',
   title: 'cookie-consent-title',
   description: 'cookie-consent-description',
   links: 'cookie-consent-links',
@@ -56,6 +58,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
   const { preferences, loading, acceptAll, rejectOptional } = useCookieConsent()
   const [showDetails, setShowDetails] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
+  const isHorizontal = options.orientation === 'horizontal'
 
   // Determine if modal should be shown
   const shouldShow = !loading && !preferences?.consentGiven
@@ -110,7 +113,10 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
 
     // Prevent body scrolling when modal is open
     const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    const shouldLockBody = !options.toastMode && !isHorizontal
+    if (shouldLockBody) {
+      document.body.style.overflow = 'hidden'
+    }
 
     // Focus the first button
     setTimeout(() => {
@@ -120,9 +126,11 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = originalOverflow
+      if (shouldLockBody) {
+        document.body.style.overflow = originalOverflow
+      }
     }
-  }, [shouldShow, rejectOptional])
+  }, [isHorizontal, options.toastMode, shouldShow, rejectOptional])
 
   // Don't render modal if it shouldn't be shown
   if (!shouldShow) {
@@ -191,7 +199,13 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
     ? `${styles.overlay} ${styles.toastOverlay}`
     : styles.overlay
 
-  const modalClass = options.toastMode ? `${styles.modal} ${styles.toast}` : styles.modal
+  const modalClass = [
+    styles.modal,
+    options.toastMode && styles.toast,
+    isHorizontal && styles.horizontal,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const buttonsClass = options.toastMode
     ? `${styles.buttons} ${styles.buttonsToast}`
@@ -200,7 +214,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
   return (
     <>
       {/* Backdrop overlay */}
-      {!options.toastMode && (
+      {!options.toastMode && !isHorizontal && (
         <div
           className={overlayClass}
           aria-hidden="true"
@@ -221,34 +235,36 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
         aria-describedby="cookie-consent-description"
         tabIndex={-1}
       >
-        <h2 id="cookie-consent-title" className={styles.title}>
-          {options.title || 'Cookie consent'}
-        </h2>
+        <div className={styles.content}>
+          <h2 id="cookie-consent-title" className={styles.title}>
+            {options.title || 'Cookie consent'}
+          </h2>
 
-        <div id="cookie-consent-description" className={styles.description}>
-          {renderDescription(
-            options.description ||
-              'We use cookies to enhance your browsing experience and analyze our traffic.'
+          <div id="cookie-consent-description" className={styles.description}>
+            {renderDescription(
+              options.description ||
+                'We use cookies to enhance your browsing experience and analyze our traffic.'
+            )}
+          </div>
+
+          {options.links && options.links.length > 0 && (
+            <div className={styles.links}>
+              {options.links.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${link.label} (opens in new tab)`}
+                >
+                  {link.label}
+                  <ExternalLinkIcon />
+                  <span className={styles.srOnly}> (opens in new tab)</span>
+                </a>
+              ))}
+            </div>
           )}
         </div>
-
-        {options.links && options.links.length > 0 && (
-          <div className={styles.links}>
-            {options.links.map((link, index) => (
-              <a
-                key={index}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${link.label} (opens in new tab)`}
-              >
-                {link.label}
-                <ExternalLinkIcon />
-                <span className={styles.srOnly}> (opens in new tab)</span>
-              </a>
-            ))}
-          </div>
-        )}
 
         {showDetails && (
           <div className={styles.details}>

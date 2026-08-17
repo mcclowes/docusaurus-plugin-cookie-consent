@@ -15,6 +15,7 @@
 | `storageKey`        | `string`                  | `cookie-consent-preferences` | `localStorage` key.                          |
 | `consentExpiryDays` | `number`                  | None                         | Positive number of days before re-prompting. |
 | `toastMode`         | `boolean`                 | `false`                      | Use the bottom toast layout.                 |
+| `orientation`       | `vertical \| horizontal`  | `vertical`                   | Use a card or full-width bottom banner.      |
 | `showDetailsButton` | `boolean`                 | `true`                       | Show category descriptions.                  |
 | `categories`        | Category configuration    | Built-in labels              | Override or hide category descriptions.      |
 | `googleConsentMode` | `GoogleConsentModeConfig` | Disabled                     | Configure Google Consent Mode v2.            |

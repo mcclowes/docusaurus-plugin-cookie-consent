@@ -88,6 +88,7 @@ export default function cookieConsentPlugin(
     storageKey: options.storageKey ?? 'cookie-consent-preferences',
     consentExpiryDays: options.consentExpiryDays,
     toastMode: options.toastMode ?? false,
+    orientation: options.orientation ?? 'vertical',
     showDetailsButton: options.showDetailsButton,
     categories: options.categories,
     googleConsentMode: options.googleConsentMode,
