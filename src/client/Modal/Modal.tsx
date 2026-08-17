@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useCookieConsent } from '../Provider'
 import type { CookieConsentOptions, CookieCategory } from '../../types'
 
 // Define class names as constants
 const styles = {
   overlay: 'cookie-consent-overlay',
+  overlayExiting: 'cookie-consent-overlay-exiting',
   toastOverlay: 'cookie-consent-toast-overlay',
   modal: 'cookie-consent-modal',
+  modalExiting: 'cookie-consent-modal-exiting',
   toast: 'cookie-consent-toast',
   horizontal: 'cookie-consent-horizontal',
   content: 'cookie-consent-content',
@@ -57,11 +59,33 @@ type CookieConsentModalProps = {
 export function CookieConsentModal({ options }: CookieConsentModalProps) {
   const { preferences, loading, acceptAll, rejectOptional } = useCookieConsent()
   const [showDetails, setShowDetails] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
+  const exitTimerRef = useRef<number | undefined>(undefined)
   const isHorizontal = options.orientation === 'horizontal'
 
   // Determine if modal should be shown
   const shouldShow = !loading && !preferences?.consentGiven
+
+  useEffect(
+    () => () => {
+      if (exitTimerRef.current !== undefined) {
+        window.clearTimeout(exitTimerRef.current)
+      }
+    },
+    []
+  )
+
+  const dismiss = useCallback(
+    (savePreferences: () => void) => {
+      if (isExiting) return
+
+      setIsExiting(true)
+      savePreferences()
+      exitTimerRef.current = window.setTimeout(() => setIsExiting(false), 180)
+    },
+    [isExiting]
+  )
 
   // Keyboard and focus management with focus trap
   useEffect(() => {
@@ -81,7 +105,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         // ESC key - treat as reject all
-        rejectOptional()
+        dismiss(rejectOptional)
         return
       }
 
@@ -130,10 +154,10 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
         document.body.style.overflow = originalOverflow
       }
     }
-  }, [isHorizontal, options.toastMode, shouldShow, rejectOptional])
+  }, [isHorizontal, options.toastMode, shouldShow, rejectOptional, dismiss])
 
   // Don't render modal if it shouldn't be shown
-  if (!shouldShow) {
+  if (!shouldShow && !isExiting) {
     return null
   }
 
@@ -197,10 +221,11 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
 
   const overlayClass = options.toastMode
     ? `${styles.overlay} ${styles.toastOverlay}`
-    : styles.overlay
+    : [styles.overlay, isExiting && styles.overlayExiting].filter(Boolean).join(' ')
 
   const modalClass = [
     styles.modal,
+    isExiting && styles.modalExiting,
     options.toastMode && styles.toast,
     isHorizontal && styles.horizontal,
   ]
@@ -292,17 +317,19 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
 
         <div className={buttonsClass}>
           <button
-            onClick={acceptAll}
+            onClick={() => dismiss(acceptAll)}
             className={`${styles.button} ${styles.buttonPrimary}`}
             type="button"
+            disabled={isExiting}
           >
             {options.acceptAllText || 'Accept all'}
           </button>
 
           <button
-            onClick={rejectOptional}
+            onClick={() => dismiss(rejectOptional)}
             className={`${styles.button} ${styles.buttonSecondary}`}
             type="button"
+            disabled={isExiting}
           >
             {options.rejectText ??
               options.rejectOptionalText ??
@@ -315,6 +342,7 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
               onClick={() => setShowDetails(!showDetails)}
               className={`${styles.button} ${styles.buttonText}`}
               type="button"
+              disabled={isExiting}
             >
               {showDetails ? 'Hide details' : 'Show details'}
             </button>

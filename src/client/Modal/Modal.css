@@ -7,6 +7,12 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 9999;
+  opacity: 1;
+  transition: opacity 180ms ease-out;
+}
+
+.cookie-consent-overlay-exiting {
+  opacity: 0;
 }
 
 /* Modal container */
@@ -28,6 +34,17 @@
   z-index: 10000;
   font-family: var(--ifm-font-family-base, system-ui, -apple-system, sans-serif);
   color: var(--ifm-font-color-base, #1a1a1a);
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out;
+}
+
+.cookie-consent-modal-exiting {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
 }
 
 /* Toast mode - bottom banner instead of centered modal */
@@ -343,5 +360,12 @@
 
   .cookie-consent-buttons-toast .cookie-consent-button {
     min-width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-consent-overlay,
+  .cookie-consent-modal {
+    transition-duration: 1ms;
   }
 }

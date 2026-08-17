@@ -120,6 +120,26 @@ describe('CookieConsentModal', () => {
     expect(stored.analytics).toBe(true)
   })
 
+  it('animates out after saving consent', async () => {
+    renderModal()
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Accept All' }))
+
+    expect(screen.getByRole('dialog')).toHaveClass('cookie-consent-modal-exiting')
+    expect(document.querySelector('.cookie-consent-overlay')).toHaveClass(
+      'cookie-consent-overlay-exiting'
+    )
+    expect(JSON.parse(localStorage.getItem('test-cookie-consent') || '{}').consentGiven).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(180)
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
   it('closes modal when optional cookies are rejected', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     renderModal()
