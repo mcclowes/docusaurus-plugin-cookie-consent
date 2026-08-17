@@ -247,6 +247,22 @@ describe('CookieConsentModal', () => {
     expect(cookieLink).toHaveAttribute('href', '/cookies')
   })
 
+  it('focuses the primary consent action when links are present', async () => {
+    const offsetParent = vi
+      .spyOn(HTMLElement.prototype, 'offsetParent', 'get')
+      .mockReturnValue(document.body)
+
+    renderModal({
+      ...defaultOptions,
+      links: [{ label: 'Privacy Policy', href: '/privacy' }],
+    })
+
+    await vi.advanceTimersByTimeAsync(100)
+
+    expect(screen.getByRole('button', { name: 'Accept All' })).toHaveFocus()
+    offsetParent.mockRestore()
+  })
+
   it('renders markdown links in description', async () => {
     const options: CookieConsentOptions = {
       ...defaultOptions,

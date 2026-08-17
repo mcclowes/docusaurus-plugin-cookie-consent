@@ -118,13 +118,13 @@ export function CookieConsentModal({ options }: CookieConsentModalProps) {
       document.body.style.overflow = 'hidden'
     }
 
-    // Focus the first button
-    setTimeout(() => {
-      const focusableElements = getFocusableElements()
-      focusableElements[0]?.focus()
+    // Lead with the primary consent action, even when policy links appear first in the DOM.
+    const focusTimer = window.setTimeout(() => {
+      modalRef.current?.querySelector<HTMLElement>(`.${styles.buttonPrimary}`)?.focus()
     }, 100)
 
     return () => {
+      window.clearTimeout(focusTimer)
       document.removeEventListener('keydown', handleKeyDown)
       if (shouldLockBody) {
         document.body.style.overflow = originalOverflow
