@@ -38,6 +38,7 @@
   max-width: 520px;
   width: calc(100% - 48px);
   max-height: calc(100vh - 48px);
+  padding-bottom: 16px;
   z-index: 10000;
 }
 
@@ -314,6 +315,7 @@
     right: 12px;
     width: calc(100% - 24px);
     max-height: calc(100vh - 24px);
+    padding-bottom: 12px;
   }
 
   .cookie-consent-horizontal {
