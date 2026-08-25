@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Docusaurus plugin providing GDPR-compliant cookie consent modal/toast with Google Consent Mode v2 integration.
+Docusaurus plugin providing cookie consent UI, preference management, and Google Consent Mode v2 integration.
 
 ## Key Commands
 
@@ -10,6 +10,7 @@ Docusaurus plugin providing GDPR-compliant cookie consent modal/toast with Googl
 npm run build      # Build plugin
 npm run dev        # Watch mode
 npm test           # Run tests
+npm run test:coverage # Run tests with coverage thresholds
 npm run typecheck  # Type check
 npm run lint       # Lint code
 npm run format     # Format code with Prettier
@@ -20,9 +21,9 @@ npm run format     # Format code with Prettier
 - `src/plugin.ts` - Docusaurus plugin entry (Node.js)
 - `src/client/` - Browser-side code (React)
   - `Provider.tsx` - Context provider with consent state + validation
-  - `Modal.tsx` - Cookie consent UI component with focus trap
+  - `Modal/Modal.tsx` - Cookie consent UI component with focus trap
   - `googleConsentMode.ts` - GTM/GA4 consent integration
-  - `clientModule.tsx` - Auto-injection module
+- `src/consentStorage.ts` - Versioned storage parsing and serialization
 - `src/theme/Root.tsx` - Theme wrapper component
 - `src/types.ts` - TypeScript definitions
 
@@ -43,13 +44,15 @@ npm run format     # Format code with Prettier
 
 ## Testing
 
-Tests in `tests/` directory using Vitest. Run with `npm test`.
+Tests are in `tests/` and use Vitest. Run `npm run test:coverage` before submitting changes.
 
 ## Documentation
 
-- `README.md` - User documentation
+- `README.md` - User guide
+- `docs/API.md` - Public API reference
+- `docs/MIGRATION.md` - Upgrade guidance
 - `CHANGELOG.md` - Version history
-- `ACCESSIBILITY.md` - A11y features and line references
+- `ACCESSIBILITY.md` - Accessibility features
 - `CONTRIBUTING.md` - Development setup
 - `IMPROVEMENTS.md` - Remaining improvement ideas
 
