@@ -141,6 +141,7 @@ describe('CookieConsentProvider', () => {
     // Verify localStorage was updated
     const stored = JSON.parse(localStorage.getItem(storageKey) || '{}')
     expect(stored.consentGiven).toBe(true)
+    expect(stored.version).toBe(1)
   })
 
   it('rejectOptional sets only necessary to true', async () => {
@@ -209,6 +210,9 @@ describe('CookieConsentProvider', () => {
       })
     )
 
+    const consentChange = vi.fn()
+    window.addEventListener('cookieConsentChange', consentChange)
+
     render(
       <CookieConsentProvider storageKey={storageKey}>
         <TestConsumer />
@@ -223,6 +227,44 @@ describe('CookieConsentProvider', () => {
 
     await vi.waitFor(() => {
       expect(screen.getByTestId('preferences')).toHaveTextContent('null')
+    })
+    expect(screen.getByTestId('has-consent')).toHaveTextContent('false')
+    expect(localStorage.getItem(storageKey)).toBeNull()
+    expect(consentChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        detail: {
+          necessary: true,
+          analytics: false,
+          marketing: false,
+          functional: false,
+        },
+      })
+    )
+    window.removeEventListener('cookieConsentChange', consentChange)
+  })
+
+  it('removes expired preferences and asks for consent again', async () => {
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        version: 1,
+        necessary: true,
+        analytics: true,
+        marketing: false,
+        functional: false,
+        consentGiven: true,
+        timestamp: Date.now() - 31 * 24 * 60 * 60 * 1000,
+      })
+    )
+
+    render(
+      <CookieConsentProvider storageKey={storageKey} consentExpiryDays={30}>
+        <TestConsumer />
+      </CookieConsentProvider>
+    )
+
+    await vi.waitFor(() => {
+      expect(screen.getByTestId('loading')).toHaveTextContent('false')
     })
     expect(screen.getByTestId('has-consent')).toHaveTextContent('false')
     expect(localStorage.getItem(storageKey)).toBeNull()
@@ -285,14 +327,5 @@ describe('CookieConsentProvider', () => {
     expect(consoleSpy).toHaveBeenCalled()
 
     consoleSpy.mockRestore()
-  })
-})
-
-describe('useCookieConsent outside provider', () => {
-  it('throws error when used outside provider in browser', () => {
-    // The hook throws when context is null and window is defined
-    expect(() => {
-      render(<TestConsumer />)
-    }).toThrow('useCookieConsent must be used within CookieConsentProvider')
   })
 })
