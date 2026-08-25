@@ -2,6 +2,7 @@
  * @vitest-environment jsdom
  */
 import React from 'react'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -37,6 +38,7 @@ describe('CookieConsentModal', () => {
   afterEach(() => {
     vi.useRealTimers()
     document.body.style.overflow = ''
+    window.history.replaceState({}, '', '/')
   })
 
   it('renders modal when no consent given', async () => {
@@ -47,6 +49,14 @@ describe('CookieConsentModal', () => {
     })
     expect(screen.getByText('Cookie Consent')).toBeInTheDocument()
     expect(screen.getByText('We use cookies to enhance your experience.')).toBeInTheDocument()
+  })
+
+  it('defines styles for every button modifier emitted by the component', () => {
+    const css = readFileSync('src/client/Modal/Modal.css', 'utf8')
+
+    expect(css).toContain('.cookie-consent-button-primary')
+    expect(css).toContain('.cookie-consent-button-secondary')
+    expect(css).toContain('.cookie-consent-button-text')
   })
 
   it('does not render when consent already given', async () => {
@@ -76,12 +86,11 @@ describe('CookieConsentModal', () => {
     })
 
     expect(screen.getByRole('button', { name: 'Accept All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Reject All' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reject Optional' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Show details' })).toBeInTheDocument()
   })
 
-  it('hides reject optional button when text not provided', async () => {
+  it('falls back to legacy reject-all text', async () => {
     const options = { ...defaultOptions, rejectOptionalText: undefined }
     renderModal(options)
 
@@ -89,7 +98,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    expect(screen.queryByRole('button', { name: 'Reject Optional' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reject All' })).toBeInTheDocument()
   })
 
   it('closes modal on Accept All click', async () => {
@@ -112,7 +121,27 @@ describe('CookieConsentModal', () => {
     expect(stored.analytics).toBe(true)
   })
 
-  it('closes modal on Reject All click', async () => {
+  it('animates out after saving consent', async () => {
+    renderModal()
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Accept All' }))
+
+    expect(screen.getByRole('dialog')).toHaveClass('cookie-consent-modal-exiting')
+    expect(document.querySelector('.cookie-consent-overlay')).toHaveClass(
+      'cookie-consent-overlay-exiting'
+    )
+    expect(JSON.parse(localStorage.getItem('test-cookie-consent') || '{}').consentGiven).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(180)
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes modal when optional cookies are rejected', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     renderModal()
 
@@ -120,7 +149,7 @@ describe('CookieConsentModal', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Reject All' }))
+    await user.click(screen.getByRole('button', { name: 'Reject Optional' }))
 
     await vi.waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -216,6 +245,24 @@ describe('CookieConsentModal', () => {
     expect(screen.getByText('Analytics')).toBeInTheDocument()
   })
 
+  it('does not grant a disabled category when accepting all', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    renderModal({
+      ...defaultOptions,
+      categories: {
+        marketing: { label: 'Marketing', enabled: false },
+      },
+    })
+
+    await user.click(await screen.findByRole('button', { name: 'Accept All' }))
+
+    expect(JSON.parse(localStorage.getItem('test-cookie-consent') || '{}')).toMatchObject({
+      analytics: true,
+      marketing: false,
+      functional: true,
+    })
+  })
+
   it('renders links when provided', async () => {
     const options: CookieConsentOptions = {
       ...defaultOptions,
@@ -237,6 +284,44 @@ describe('CookieConsentModal', () => {
 
     const cookieLink = screen.getByRole('link', { name: /Cookie Policy/i })
     expect(cookieLink).toHaveAttribute('href', '/cookies')
+  })
+
+  it('links to the site-owned preference page', async () => {
+    renderModal({
+      ...defaultOptions,
+      preferencesHref: '/cookie-settings',
+      preferencesLinkText: 'Cookie settings',
+    })
+
+    expect(await screen.findByRole('link', { name: 'Cookie settings' })).toHaveAttribute(
+      'href',
+      '/cookie-settings'
+    )
+  })
+
+  it('does not cover the preference page before consent is given', async () => {
+    window.history.replaceState({}, '', '/cookie-settings/')
+    renderModal({ ...defaultOptions, preferencesHref: '/cookie-settings' })
+
+    await vi.waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
+  })
+
+  it('focuses the primary consent action when links are present', async () => {
+    const offsetParent = vi
+      .spyOn(HTMLElement.prototype, 'offsetParent', 'get')
+      .mockReturnValue(document.body)
+
+    renderModal({
+      ...defaultOptions,
+      links: [{ label: 'Privacy Policy', href: '/privacy' }],
+    })
+
+    await vi.advanceTimersByTimeAsync(100)
+
+    expect(screen.getByRole('button', { name: 'Accept All' })).toHaveFocus()
+    offsetParent.mockRestore()
   })
 
   it('renders markdown links in description', async () => {
@@ -327,6 +412,29 @@ describe('CookieConsentModal', () => {
     expect(dialog.className).toContain('cookie-consent-toast')
   })
 
+  it('renders the horizontal banner without a backdrop', async () => {
+    document.body.style.overflow = 'auto'
+    renderModal({ ...defaultOptions, orientation: 'horizontal' })
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(screen.getByRole('dialog')).toHaveClass('cookie-consent-horizontal')
+    expect(document.querySelector('.cookie-consent-overlay')).not.toBeInTheDocument()
+    expect(document.body.style.overflow).toBe('auto')
+  })
+
+  it('keeps the existing vertical layout by default', async () => {
+    renderModal()
+
+    await vi.waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    expect(screen.getByRole('dialog')).not.toHaveClass('cookie-consent-horizontal')
+  })
+
   it('renders overlay in non-toast mode', async () => {
     renderModal()
 
@@ -376,8 +484,7 @@ describe('CookieConsentModal', () => {
     const options: CookieConsentOptions = {
       ...defaultOptions,
       acceptAllText: 'I Accept',
-      rejectAllText: 'No Thanks',
-      rejectOptionalText: 'Only Essential',
+      rejectText: 'Only Essential',
     }
     renderModal(options)
 
@@ -386,7 +493,6 @@ describe('CookieConsentModal', () => {
     })
 
     expect(screen.getByRole('button', { name: 'I Accept' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'No Thanks' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Only Essential' })).toBeInTheDocument()
   })
 })

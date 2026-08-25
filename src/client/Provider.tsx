@@ -1,15 +1,14 @@
 import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react'
 import type { CookieCategory, ConsentState, GoogleConsentModeConfig } from '../types'
+import {
+  parseStoredPreferences,
+  serializePreferences,
+  type CookiePreferences,
+} from '../consentStorage'
 import { initGoogleConsentMode, updateGoogleConsent } from './googleConsentMode'
+import { COOKIE_CONSENT_CHANGE_EVENT } from './consent'
 
-export type CookiePreferences = {
-  necessary: boolean
-  analytics: boolean
-  marketing: boolean
-  functional: boolean
-  consentGiven: boolean
-  timestamp?: number
-}
+export type { CookiePreferences } from '../consentStorage'
 
 type CookieContextType = {
   preferences: CookiePreferences | null
@@ -24,35 +23,6 @@ type CookieContextType = {
 }
 
 const CookieConsentContext = createContext<CookieContextType | null>(null)
-
-/**
- * Validates that stored preferences have the expected shape.
- * Returns null if validation fails, allowing the modal to show again.
- */
-function validatePreferences(data: unknown): CookiePreferences | null {
-  if (!data || typeof data !== 'object') return null
-
-  const prefs = data as Record<string, unknown>
-
-  // Check required boolean fields
-  if (typeof prefs.necessary !== 'boolean') return null
-  if (typeof prefs.analytics !== 'boolean') return null
-  if (typeof prefs.marketing !== 'boolean') return null
-  if (typeof prefs.functional !== 'boolean') return null
-  if (typeof prefs.consentGiven !== 'boolean') return null
-
-  // timestamp is optional but must be a number if present
-  if (prefs.timestamp !== undefined && typeof prefs.timestamp !== 'number') return null
-
-  return {
-    necessary: prefs.necessary,
-    analytics: prefs.analytics,
-    marketing: prefs.marketing,
-    functional: prefs.functional,
-    consentGiven: prefs.consentGiven,
-    timestamp: prefs.timestamp as number | undefined,
-  }
-}
 
 export function useCookieConsent() {
   const context = useContext(CookieConsentContext)
@@ -79,15 +49,15 @@ export function useCookieConsent() {
 type CookieConsentProviderProps = {
   children: React.ReactNode
   storageKey?: string
+  consentExpiryDays?: number
   googleConsentMode?: GoogleConsentModeConfig
-  onConsentChange?: (consent: ConsentState) => void
 }
 
 export function CookieConsentProvider({
   children,
   storageKey = 'cookie-consent-preferences',
+  consentExpiryDays,
   googleConsentMode,
-  onConsentChange,
 }: CookieConsentProviderProps) {
   const [preferences, setPreferences] = useState<CookiePreferences | null>(null)
   const [loading, setLoading] = useState(true)
@@ -105,7 +75,7 @@ export function CookieConsentProvider({
     try {
       const stored = localStorage.getItem(storageKey)
       if (stored) {
-        const parsed = validatePreferences(JSON.parse(stored))
+        const parsed = parseStoredPreferences(JSON.parse(stored), consentExpiryDays)
         if (parsed?.consentGiven) {
           storedConsent = {
             necessary: true,
@@ -120,7 +90,7 @@ export function CookieConsentProvider({
     }
 
     initGoogleConsentMode(googleConsentMode, storedConsent)
-  }, [googleConsentMode, storageKey])
+  }, [consentExpiryDays, googleConsentMode, storageKey])
 
   // Load preferences from localStorage on mount
   useEffect(() => {
@@ -134,7 +104,7 @@ export function CookieConsentProvider({
       const stored = localStorage.getItem(storageKey)
 
       if (stored) {
-        const parsed = validatePreferences(JSON.parse(stored))
+        const parsed = parseStoredPreferences(JSON.parse(stored), consentExpiryDays)
         if (parsed) {
           setPreferences(parsed)
         } else {
@@ -153,7 +123,7 @@ export function CookieConsentProvider({
     } finally {
       setLoading(false)
     }
-  }, [storageKey])
+  }, [consentExpiryDays, storageKey])
 
   // Helper to notify consent changes
   const notifyConsentChange = useCallback(
@@ -173,16 +143,13 @@ export function CookieConsentProvider({
       // Dispatch custom DOM event for third-party integrations
       if (typeof window !== 'undefined') {
         window.dispatchEvent(
-          new CustomEvent('cookieConsentChange', {
+          new CustomEvent(COOKIE_CONSENT_CHANGE_EVENT, {
             detail: consentState,
           })
         )
       }
-
-      // Call custom callback if provided
-      onConsentChange?.(consentState)
     },
-    [googleConsentMode?.enabled, onConsentChange]
+    [googleConsentMode?.enabled]
   )
 
   // Update consent helper
@@ -191,7 +158,7 @@ export function CookieConsentProvider({
       setPreferences(value)
       if (typeof window !== 'undefined') {
         try {
-          localStorage.setItem(storageKey, JSON.stringify(value))
+          localStorage.setItem(storageKey, JSON.stringify(serializePreferences(value)))
         } catch (error) {
           console.warn(
             '[docusaurus-plugin-cookie-consent] Failed to save preferences to localStorage:',
@@ -266,7 +233,7 @@ export function CookieConsentProvider({
 
         if (typeof window !== 'undefined') {
           try {
-            localStorage.setItem(storageKey, JSON.stringify(next))
+            localStorage.setItem(storageKey, JSON.stringify(serializePreferences(next)))
           } catch (error) {
             console.warn('[docusaurus-plugin-cookie-consent] Failed to save preferences:', error)
           }
@@ -290,7 +257,15 @@ export function CookieConsentProvider({
         console.warn('[docusaurus-plugin-cookie-consent] Failed to reset consent:', error)
       }
     }
-  }, [storageKey])
+    notifyConsentChange({
+      necessary: true,
+      analytics: false,
+      marketing: false,
+      functional: false,
+      consentGiven: false,
+      timestamp: Date.now(),
+    })
+  }, [notifyConsentChange, storageKey])
 
   const value: CookieContextType = {
     preferences,
