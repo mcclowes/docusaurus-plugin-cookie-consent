@@ -55,15 +55,31 @@ export type CookieConsentOptions = {
    */
   links?: CookieConsentLink[]
   /**
+   * Site-owned page where visitors can manage individual cookie categories.
+   * The banner is suppressed on this exact path so the settings form remains accessible.
+   */
+  preferencesHref?: string
+  /**
+   * Text for the cookie settings link.
+   * @default 'Manage preferences'
+   */
+  preferencesLinkText?: string
+  /**
    * Text for the "Accept All" button
    */
   acceptAllText?: string
   /**
+   * Text for the button that rejects all optional cookies.
+   */
+  rejectText?: string
+  /**
    * Text for the "Reject Optional" button (only rejects non-necessary cookies)
+   * @deprecated Use rejectText.
    */
   rejectOptionalText?: string
   /**
    * Text for the "Reject All" button (rejects all except necessary)
+   * @deprecated Use rejectText.
    */
   rejectAllText?: string
   /**
@@ -71,9 +87,20 @@ export type CookieConsentOptions = {
    */
   storageKey?: string
   /**
+   * Number of days before saved consent expires and the banner is shown again.
+   * Omit to keep consent until the user resets it.
+   */
+  consentExpiryDays?: number
+  /**
    * Show the modal as a toast (bottom of screen) instead of centered modal
    */
   toastMode?: boolean
+  /**
+   * Layout direction for the consent UI.
+   * Horizontal renders a full-width banner along the bottom of the viewport.
+   * @default 'vertical'
+   */
+  orientation?: 'vertical' | 'horizontal'
   /**
    * Cookie categories and their descriptions
    */
@@ -95,9 +122,4 @@ export type CookieConsentOptions = {
    * to control GTM, GA4, and Google Ads based on user consent.
    */
   googleConsentMode?: GoogleConsentModeConfig
-  /**
-   * Callback fired when consent preferences change.
-   * Use this for custom integrations with other analytics/tracking tools.
-   */
-  onConsentChange?: (consent: ConsentState) => void
 }

@@ -13,7 +13,11 @@ const config: Config = {
   trailingSlash: false,
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -46,8 +50,10 @@ const config: Config = {
         description:
           'We use analytics to understand how our documentation is used so we can keep improving it. You can change your preferences at any time.',
         acceptAllText: 'Accept all cookies',
-        rejectOptionalText: 'Only necessary',
-        rejectAllText: 'Reject all',
+        rejectText: 'Only necessary',
+        consentExpiryDays: 180,
+        preferencesHref: '/cookie-settings',
+        preferencesLinkText: 'Manage cookie settings',
         links: [
           { label: 'Privacy policy', href: '/docs/privacy-policy' },
           { label: 'Cookie usage', href: '/docs/cookie-usage' },
