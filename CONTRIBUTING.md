@@ -24,17 +24,18 @@ Thanks for your interest in contributing to `docusaurus-plugin-cookie-consent`!
 
 ## Available Scripts
 
-| Command                | Description                     |
-| ---------------------- | ------------------------------- |
-| `npm run build`        | Build the plugin for production |
-| `npm run dev`          | Watch mode for development      |
-| `npm run typecheck`    | Run TypeScript type checking    |
-| `npm run lint`         | Run ESLint                      |
-| `npm run lint:fix`     | Run ESLint with auto-fix        |
-| `npm run format`       | Format code with Prettier       |
-| `npm run format:check` | Check code formatting           |
-| `npm test`             | Run tests                       |
-| `npm run test:watch`   | Run tests in watch mode         |
+| Command                 | Description                     |
+| ----------------------- | ------------------------------- |
+| `npm run build`         | Build the plugin for production |
+| `npm run dev`           | Watch mode for development      |
+| `npm run typecheck`     | Run TypeScript type checking    |
+| `npm run lint`          | Run ESLint                      |
+| `npm run lint:fix`      | Run ESLint with auto-fix        |
+| `npm run format`        | Format code with Prettier       |
+| `npm run format:check`  | Check code formatting           |
+| `npm test`              | Run tests                       |
+| `npm run test:coverage` | Run tests and enforce coverage  |
+| `npm run test:watch`    | Run tests in watch mode         |
 
 ## Testing Locally
 
@@ -72,7 +73,7 @@ npm start
 3. Run tests and linting:
 
    ```bash
-   npm test
+   npm run test:coverage
    npm run lint
    npm run typecheck
    ```
