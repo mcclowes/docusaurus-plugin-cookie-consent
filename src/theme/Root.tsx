@@ -20,8 +20,8 @@ export default function Root({ children }: { children: React.ReactNode }) {
   return (
     <CookieConsentProvider
       storageKey={storageKey}
+      consentExpiryDays={options?.consentExpiryDays}
       googleConsentMode={options?.googleConsentMode}
-      onConsentChange={options?.onConsentChange}
     >
       {children}
       {options && <BrowserOnly>{() => <CookieConsentModal options={options} />}</BrowserOnly>}
