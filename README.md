@@ -5,15 +5,16 @@
 
 ![](banner.png)
 
-A cookie consent modal/toast component for Docusaurus sites with configurable text, links, and preference management. Automatically inserts a GDPR-compliant cookie consent banner into your Docusaurus site.
+A cookie consent modal or toast for Docusaurus sites, with configurable text, links, preference management, and Google Consent Mode support. It provides the consent UI and state; your site remains responsible for blocking optional scripts and meeting applicable privacy requirements.
 
 ## Features
 
 - ✅ **Configurable text** (markdown compatible)
 - ✅ **Configurable links** to privacy policy, cookie policy, etc.
-- ✅ **Multiple consent options**: Accept All, Reject Optional, Reject All
-- ✅ **Helper context/hooks** to ensure compliance with user preferences
+- ✅ **Clear consent options**: Accept all or reject optional cookies
+- ✅ **Helper context/hooks** for respecting user preferences
 - ✅ **Local storage tracking** of user preferences
+- ✅ **Optional consent expiry** with automatic re-prompting
 - ✅ **Modal or toast mode** (centered modal or bottom toast)
 - ✅ **Cookie categories** (Necessary, Analytics, Marketing, Functional)
 - ✅ **Google Consent Mode v2** integration for GTM/GA4
@@ -62,7 +63,9 @@ export default config
 
 That's it! The cookie consent banner will automatically appear on your site.
 
-## Configuration Options
+See [API reference](docs/API.md) for the complete public API and [migration guide](docs/MIGRATION.md) when upgrading.
+
+## Configuration options
 
 ### Basic Configuration
 
@@ -83,16 +86,25 @@ That's it! The cookie consent banner will automatically appear on your site.
     href: string
   }>
 
+  // Optional site-owned page for detailed category management
+  preferencesHref?: string
+  preferencesLinkText?: string // default: 'Manage preferences'
+
   // Button text customization
-  acceptAllText?: string        // default: 'Accept All'
-  rejectOptionalText?: string  // default: 'Reject Optional'
-  rejectAllText?: string       // default: 'Reject All'
+  acceptAllText?: string // default: 'Accept all'
+  rejectText?: string    // default: 'Reject optional'
 
   // Local storage key for preferences (default: 'cookie-consent-preferences')
   storageKey?: string
 
+  // Re-prompt after this many days. Omit to keep consent until reset.
+  consentExpiryDays?: number
+
   // Show as toast (bottom of screen) instead of centered modal (default: false)
   toastMode?: boolean
+
+  // Use the existing card or a full-width bottom banner (default: 'vertical')
+  orientation?: 'vertical' | 'horizontal'
 }
 ```
 
@@ -148,12 +160,6 @@ Integrate with Google Tag Manager, Google Analytics 4, and Google Ads using [Goo
     // Pass ad click info through URL parameters when cookies denied (default: false)
     urlPassthrough: false,
   },
-
-  // Optional: callback when consent changes (for custom integrations)
-  onConsentChange: (consent) => {
-    console.log('Consent updated:', consent)
-    // { necessary: true, analytics: true, marketing: false, functional: true }
-  },
 }
 ```
 
@@ -185,10 +191,11 @@ const config: Config = {
           { label: 'Terms of Service', href: '/terms' },
         ],
         acceptAllText: 'Accept All Cookies',
-        rejectOptionalText: 'Essential Only',
-        rejectAllText: 'Reject All',
+        rejectText: 'Essential only',
         toastMode: true, // Show as bottom toast instead of modal
+        orientation: 'horizontal', // Stretch the consent UI across the viewport
         storageKey: 'my-site-cookie-consent',
+        consentExpiryDays: 180,
         categories: {
           necessary: {
             label: 'Essential Cookies',
@@ -227,20 +234,16 @@ import React from 'react'
 import { useCookieConsent } from 'docusaurus-plugin-cookie-consent'
 
 export default function AnalyticsComponent() {
-  const { hasCategoryConsent, hasConsent } = useCookieConsent()
+  const { hasCategoryConsent } = useCookieConsent()
 
-  // Only load analytics if user has consented
-  if (!hasCategoryConsent('analytics')) {
-    return null
-  }
-
-  // Load your analytics script here
   React.useEffect(() => {
+    if (!hasCategoryConsent('analytics')) return
+
     // Initialize Google Analytics, etc.
     console.log('Analytics enabled')
-  }, [])
+  }, [hasCategoryConsent])
 
-  return <div>Analytics content</div>
+  return null
 }
 ```
 
@@ -260,10 +263,10 @@ const {
   // Programmatically accept all cookies
   acceptAll: () => void
 
-  // Reject optional cookies (keep only necessary)
+  // Reject optional cookies, keeping necessary cookies enabled
   rejectOptional: () => void
 
-  // Reject all cookies (except necessary)
+  // Backward-compatible alias for rejectOptional
   rejectAll: () => void
 
   // Update specific preferences
@@ -349,7 +352,7 @@ Links will be automatically converted to clickable `<a>` tags.
 
 ## Local Storage
 
-User preferences are automatically saved to `localStorage` using the key specified in `storageKey` (default: `'cookie-consent-preferences'`). The preferences persist across page reloads and browser sessions.
+User preferences are saved to `localStorage` using `storageKey` (default: `'cookie-consent-preferences'`). Stored records include an internal schema version. Set `consentExpiryDays` to remove expired records and show the banner again.
 
 To reset consent and show the banner again:
 
@@ -365,7 +368,7 @@ function ResetButton() {
 
 ## Styling
 
-The modal/toast uses inline styles for maximum compatibility. The default styling includes:
+The modal and toast use stable `cookie-consent-*` CSS classes. The default stylesheet includes:
 
 - White background with rounded corners
 - Shadow for depth
@@ -373,12 +376,7 @@ The modal/toast uses inline styles for maximum compatibility. The default stylin
 - Accessible color contrast
 - Hover effects on buttons
 
-To customize the appearance, you can:
-
-1. **Override with CSS**: Add custom CSS to your Docusaurus site that targets the cookie consent elements
-2. **Use browser dev tools**: Inspect the elements and add custom styles via your site's CSS
-
-Because the plugin renders without static IDs or classes, target elements using attribute selectors (for example, `[role="dialog"]`) or wrap the banner in your own container for easier styling.
+To customize the appearance, inspect the banner and override its `cookie-consent-*` classes in your site's CSS. For example, target `.cookie-consent-modal`, `.cookie-consent-button-primary`, or `.cookie-consent-toast`.
 
 ## TypeScript Support
 
@@ -409,6 +407,9 @@ npm run dev
 
 # Type checking
 npm run typecheck
+
+# Tests with coverage thresholds
+npm run test:coverage
 ```
 
 ## Testing Locally
@@ -487,7 +488,7 @@ Tags configured this way will only fire after the user grants consent.
 
 ## Custom Analytics Integration (PostHog, Plausible, etc.)
 
-For analytics tools that don't support Google Consent Mode, the plugin dispatches a custom DOM event whenever consent changes. You can listen to this event to conditionally initialize or shutdown your analytics.
+For analytics tools that don't support Google Consent Mode, use the browser subscription API. It reports the current stored choice, same-page changes, and changes made in other tabs.
 
 ### The `cookieConsentChange` Event
 
@@ -516,7 +517,7 @@ Create a client module that listens for consent changes:
 // src/clientModules/posthog.js
 import posthog from 'posthog-js'
 
-const STORAGE_KEY = 'cookie-consent-preferences' // Match your plugin's storageKey
+import { subscribeToCookieConsent } from 'docusaurus-plugin-cookie-consent/client'
 
 let initialized = false
 
@@ -532,23 +533,16 @@ function shutdownPosthog() {
   initialized = false
 }
 
-// Listen for consent changes
-window.addEventListener('cookieConsentChange', (event) => {
-  if (event.detail.analytics) {
-    initPosthog()
-  } else {
-    shutdownPosthog()
-  }
-})
-
-// Check initial consent on page load
-const stored = localStorage.getItem(STORAGE_KEY)
-if (stored) {
-  const prefs = JSON.parse(stored)
-  if (prefs.analytics) {
-    initPosthog()
-  }
-}
+subscribeToCookieConsent(
+  (consent) => {
+    if (consent?.analytics) {
+      initPosthog()
+    } else {
+      shutdownPosthog()
+    }
+  },
+  { storageKey: 'cookie-consent-preferences' }
+)
 ```
 
 Register the client module in a custom plugin:
@@ -586,48 +580,22 @@ window.addEventListener('cookieConsentChange', (event) => {
 })
 ```
 
-### Using the `onConsentChange` Callback
+## Privacy responsibilities
 
-Alternatively, use the `onConsentChange` config option for simpler integrations:
+This plugin supplies building blocks commonly needed by consent implementations:
 
-```typescript
-// docusaurus.config.ts
-{
-  plugins: [
-    [
-      'docusaurus-plugin-cookie-consent',
-      {
-        onConsentChange: (consent) => {
-          if (consent.analytics) {
-            // Enable analytics
-          } else {
-            // Disable analytics
-          }
-        },
-      },
-    ],
-  ],
-}
-```
-
-**Note:** The `onConsentChange` callback runs in the React context, while the DOM event works anywhere including vanilla JS client modules.
-
-## GDPR Compliance
-
-This plugin helps you comply with GDPR requirements by:
-
-- ✅ Obtaining explicit consent before setting non-essential cookies
+- ✅ Collecting a choice before your code enables non-essential cookies
 - ✅ Providing clear information about cookie usage
 - ✅ Allowing users to reject non-essential cookies
 - ✅ Storing consent preferences
 - ✅ Providing hooks to conditionally load scripts based on consent
 
-**Note**: This plugin provides the UI and preference management. You are responsible for:
+It doesn't provide legal advice or automatically block third-party scripts. You are responsible for:
 
 - Actually respecting the preferences in your code (using the hooks)
 - Not loading analytics/marketing scripts until consent is given
 - Providing accurate privacy and cookie policy pages
-- Ensuring your implementation meets your jurisdiction's specific requirements
+- Confirming that your implementation meets the requirements that apply to your users
 
 ## License
 
