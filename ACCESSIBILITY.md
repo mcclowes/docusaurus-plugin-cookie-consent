@@ -14,7 +14,7 @@ The modal dialog includes proper ARIA attributes for screen readers:
 - **`aria-describedby="cookie-consent-description"`**: Links to the dialog description
 - **`aria-hidden="true"`**: Applied to the backdrop to hide it from screen readers
 
-**Location**: `src/client/Modal.tsx:192-200`
+**Location**: `src/client/Modal/Modal.tsx`
 
 ### 2. Focus Management
 
@@ -23,17 +23,17 @@ Proper focus handling ensures keyboard users can navigate effectively:
 - **Auto-focus on open**: When the modal opens, focus is automatically moved to the first button
 - **Body scroll prevention**: The page body scrolling is disabled while the modal is open
 
-**Location**: `src/client/Modal.tsx:42-103`
+**Location**: `src/client/Modal/Modal.tsx`
 
 ### 3. Keyboard Navigation
 
 Keyboard support for interactions:
 
-- **ESC key**: Pressing Escape triggers the "Reject All" action and closes the modal
+- **ESC key**: Pressing Escape rejects optional cookies and closes the modal
 - **Tab/Shift+Tab**: Full focus trap - cycles within modal (doesn't escape to page content)
 - **Enter/Space**: Activate buttons (native browser behavior)
 
-**Location**: `src/client/Modal.tsx:56-84`
+**Location**: `src/client/Modal/Modal.tsx`
 
 ### 4. Screen Reader Announcements
 
@@ -43,10 +43,7 @@ Links that open in new tabs include appropriate warnings for screen reader users
 - **aria-label**: Enhanced labels like `"Privacy Policy (opens in new tab)"`
 - **Applies to**: Both markdown-style links in descriptions and configured link arrays
 
-**Location**:
-
-- Markdown links: `src/client/Modal.tsx:111-143` (renderDescription function)
-- Link array: `src/client/Modal.tsx:212-226`
+**Location**: `src/client/Modal/Modal.tsx`
 
 ### 5. Semantic HTML
 
@@ -55,7 +52,7 @@ Proper heading hierarchy and semantic elements:
 - **`<h2>` heading**: Dialog title uses proper heading level with `id` for ARIA reference
 - **Descriptive IDs**: All referenced elements have clear, semantic IDs
 
-**Location**: `src/client/Modal.tsx:201-211`
+**Location**: `src/client/Modal/Modal.tsx`
 
 ### 6. Backdrop Interaction Prevention
 
@@ -64,7 +61,7 @@ The modal backdrop properly blocks interaction with page content:
 - **Click prevention**: Clicks on the backdrop are prevented from reaching underlying content
 - **`aria-hidden`**: Backdrop is hidden from assistive technologies
 
-**Location**: `src/client/Modal.tsx:178-190`
+**Location**: `src/client/Modal/Modal.tsx`
 
 ## Testing Accessibility
 
@@ -91,9 +88,9 @@ Recommended tools for automated accessibility testing:
 - **WAVE**: Web accessibility evaluation tool
 - **Lighthouse**: Includes accessibility audits (built into Chrome DevTools)
 
-## WCAG 2.1 Compliance
+## WCAG 2.1 support
 
-This implementation meets the following WCAG 2.1 Level AA criteria:
+The implementation includes behavior relevant to the following WCAG 2.1 criteria. Test the finished site with its own theme, content, and browser support before making a compliance claim.
 
 - **1.3.1 Info and Relationships (Level A)**: Proper semantic structure and ARIA attributes
 - **2.1.1 Keyboard (Level A)**: All functionality available via keyboard

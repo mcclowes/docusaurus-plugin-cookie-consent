@@ -44,4 +44,35 @@ jobs:
         run: npm run format:check
 
       - name: Run tests
-        run: npm test
+        run: npm run test:coverage
+
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install package dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Pack release artifact
+        run: npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+
+      - name: Install release artifact in sample site
+        working-directory: examples/sample-site
+        run: npm install --no-save --package-lock=false "$RUNNER_TEMP/docusaurus-plugin-cookie-consent-$(node -p "require('../../package.json').version").tgz"
+
+      - name: Build sample site
+        working-directory: examples/sample-site
+        run: npm run build
