@@ -51,3 +51,8 @@ temp/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Added by saggar — local files that shouldn't be committed
+.saggar/**/*.local.*
+.saggar/scratchpad.md
+.saggar/jobs/
