@@ -34,6 +34,9 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Test release state checks
+        run: npm run test:release
+
       - name: Type check
         run: npm run typecheck
 

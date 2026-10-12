@@ -35,6 +35,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run --pool=threads --maxWorkers=1 --no-file-parallelism",
+    "test:release": "node --test scripts/release-state.test.mjs",
     "test:coverage": "npm test -- --coverage",
     "test:watch": "vitest --pool=threads --maxWorkers=1 --no-file-parallelism",
     "prepare": "husky",
