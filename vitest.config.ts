@@ -16,14 +16,25 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['tests/**/*.test.{ts,tsx}'],
-    environmentMatchGlobs: [
-      // Use jsdom for component tests
-      ['tests/**/*.test.tsx', 'jsdom'],
-      // Use node for plugin tests
-      ['tests/**/*.test.ts', 'node'],
-    ],
     setupFiles: ['./tests/setup.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          include: ['tests/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'client',
+          include: ['tests/**/*.test.tsx'],
+          environment: 'jsdom',
+        },
+      },
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'lcov'],

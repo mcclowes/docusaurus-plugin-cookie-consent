@@ -46,6 +46,10 @@ npm run format     # Format code with Prettier
 
 Tests are in `tests/` and use Vitest. Run `npm run test:coverage` before submitting changes.
 
+- The `node` project runs `tests/**/*.test.ts` in Node by default; existing `@vitest-environment jsdom` annotations select jsdom for browser helpers.
+- The `client` project runs `tests/**/*.test.tsx` in jsdom. Both projects inherit the shared Docusaurus aliases and cleanup from `vitest.config.ts`.
+- `npm run typecheck` checks source and both build/test configs. Keep the test config compatible with the installed Vitest API.
+
 ## Documentation
 
 - `README.md` - User guide
