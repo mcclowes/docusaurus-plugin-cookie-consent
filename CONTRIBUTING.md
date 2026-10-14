@@ -2,7 +2,10 @@
 
 Thanks for your interest in contributing to `docusaurus-plugin-cookie-consent`!
 
-## Development Setup
+## Development setup
+
+Use Node 24 before installing dependencies. CI tests Node 20, 22, and 24; Node 24
+meets the locked development tools' runtime requirements.
 
 1. Clone the repository:
 

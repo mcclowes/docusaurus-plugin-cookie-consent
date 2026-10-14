@@ -395,6 +395,9 @@ import type {
 
 ## Development
 
+Use Node 24 for development and checks, matching a tested CI runtime and the locked
+test tools' requirements. See [the contributor guide](CONTRIBUTING.md) for setup.
+
 ```bash
 # Install dependencies
 npm install

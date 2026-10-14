@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Recommend Node 24 in the contributor setup guides to match the locked development tools and CI.
 - Use supported Vitest projects for test environments and validate the test config in the normal type check.
 - Refresh Docusaurus development dependencies and compatible transitive fixes, use lint-staged 16 with Node 20 support, and remove unused patch-package.
 
