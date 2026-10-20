@@ -39,7 +39,7 @@ jobs:
       - name: Check if already published
         id: check
         run: |
-          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          if git ls-remote --exit-code --tags origin "refs/tags/v${{ steps.version.outputs.version }}" >/dev/null; then
             echo "Tag v${{ steps.version.outputs.version }} already exists, skipping"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
